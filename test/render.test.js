@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { demoData } from '../src/demo.js';
+import { renderSVG } from '../src/render.js';
 import { computeStats, toWeeks } from '../src/stats.js';
 import { hashString, mulberry32 } from '../src/prng.js';
 import { parseContributionsHtml } from '../src/github.js';
@@ -44,6 +45,30 @@ test('demo covers ~53 weeks ending today', () => {
   const days = d.weeks.flat();
   assert.ok(d.weeks.length >= 52 && d.weeks.length <= 54);
   assert.equal(days.at(-1).date, '2026-10-31');
+});
+
+test('svg is valid-looking, script-free, small and deterministic', () => {
+  const data = demoData({ today });
+  const a = renderSVG(data, { theme: 'color' });
+  const b = renderSVG(data, { theme: 'color' });
+  assert.equal(a, b);
+  assert.match(a, /^<svg[\s\S]*<\/svg>\s*$/);
+  assert.doesNotMatch(a, /<script/i);
+  assert.ok(Buffer.byteLength(a) < 300 * 1024, 'under 300 KB');
+  const rings = a.match(/class="o"/g) ?? [];
+  assert.equal(rings.length, data.weeks.slice(-53).length);
+  assert.match(a, /class="pulse"/); // today
+  assert.match(a, /class="flare"/); // best day
+});
+
+test('bw theme has no warm colors', () => {
+  const svg = renderSVG(demoData({ today }), { theme: 'bw' });
+  assert.doesNotMatch(svg, /#ff8f3d|#ffb45e/);
+});
+
+test('user name is escaped', () => {
+  const data = { ...demoData({ today }), user: '<x>&' };
+  assert.match(renderSVG(data), /@&lt;x&gt;&amp;/);
 });
 
 test('parses the public contributions page', () => {
