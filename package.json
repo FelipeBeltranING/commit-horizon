@@ -1,13 +1,27 @@
 {
   "name": "commit-horizon",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Your GitHub year spiraling into a black hole — an animated SVG for your profile README.",
   "type": "module",
+  "bin": {
+    "commit-horizon": "bin/commit-horizon.js"
+  },
   "scripts": {
+    "demo": "node scripts/demo.js",
+    "preview": "node scripts/preview.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=18"
   },
+  "keywords": [
+    "github",
+    "readme",
+    "profile",
+    "svg",
+    "contributions",
+    "black-hole",
+    "space"
+  ],
   "license": "MIT"
 }
