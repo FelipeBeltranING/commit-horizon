@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Preview (localhost:4321)",
+      "program": "${workspaceFolder}/scripts/preview.js",
+      "cwd": "${workspaceFolder}",
+      "serverReadyAction": {
+        "pattern": "→ (http://localhost:\\d+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Generate my black hole",
+      "program": "${workspaceFolder}/bin/commit-horizon.js",
+      "args": ["--user", "FelipeBeltranING", "--out", "out/me.svg"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
