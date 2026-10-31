@@ -28,6 +28,22 @@ const THEMES = {
     muted: '#7f889c',
     accent: '#ffb45e',
   },
+  bw: {
+    bg: '#000000',
+    bgGlow: '#0c0c0c',
+    star: '#ffffff',
+    temp: [
+      [0, '#ffffff'],
+      [0.4, '#d6d6d6'],
+      [1, '#7a7a7a'],
+    ],
+    hot: '#ffffff',
+    warm: '#d0d0d0',
+    ring: '#ffffff',
+    text: '#f2f2f2',
+    muted: '#808080',
+    accent: '#ffffff',
+  },
 };
 
 export const THEME_NAMES = Object.keys(THEMES);
@@ -60,7 +76,7 @@ const shortDate = (d) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(
 
 /**
  * @param {{ user: string, weeks: {date:string,count:number}[][], repos?: number }} data
- * @param {{ theme?: 'color' }} [opts]
+ * @param {{ theme?: 'color'|'bw' }} [opts]
  */
 export function renderSVG(data, opts = {}) {
   const theme = THEMES[opts.theme] ? opts.theme : 'color';
