@@ -1,0 +1,5 @@
+node_modules/
+out/*
+!out/commit-horizon-color.svg
+!out/commit-horizon-bw.svg
+.DS_Store
