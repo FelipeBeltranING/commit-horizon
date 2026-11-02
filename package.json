@@ -23,5 +23,8 @@
     "black-hole",
     "space"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "optionalDependencies": {
+    "devicon": "^2.16.0"
+  }
 }
