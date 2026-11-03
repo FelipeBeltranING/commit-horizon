@@ -1,4 +1,5 @@
-// Language planets orbiting the black hole on tilted ellipses.
+// Language logos orbiting the black hole on tilted ellipses
+// (style "logos" = just the floating logo, style "planets" = logo inside a planet).
 // CSS only: an ellipse is two perpendicular sine motions (translateX / translateY)
 // with a quarter-period offset. Each planet is drawn twice — once behind the
 // shadow and once in front — and an opacity toggle decides which copy is visible,
@@ -29,7 +30,7 @@ function label(lang, y, T) {
   return `<text y="${f2(y)}" text-anchor="middle" font-size="9" fill="${T.muted}" letter-spacing=".5">${esc(lang.name)} ${Math.round(lang.share * 100)}%</text>`;
 }
 
-// The logo sits inside a small glowing planet.
+// Style "planets": the logo sits inside a small glowing planet.
 function planetBody(lang, s, i, T, showLabel) {
   const glow = `<circle r="${f2(s * 2.1)}" fill="url(#pg${i})"/>`;
   let core;
@@ -47,10 +48,28 @@ function planetBody(lang, s, i, T, showLabel) {
   return glow + core + shade + (showLabel ? label(lang, s + 12, T) : '');
 }
 
+// Style "logos" (default): just the logo floating, gently swaying, no planet.
+function logoBody(lang, s, i, T, showLabel) {
+  const k = s * 2.3; // logo box size
+  let core;
+  if (lang.icon) {
+    // Dark logos get a faint light halo so they don't vanish into space.
+    const halo = LIGHT_CORE.has(lang.name) ? `<circle r="${f2(k * 0.55)}" fill="url(#lh)"/>` : '';
+    core =
+      halo +
+      `<svg x="${f2(-k / 2)}" y="${f2(-k / 2)}" width="${f2(k)}" height="${f2(k)}" viewBox="${esc(lang.icon.viewBox)}" overflow="visible">${lang.icon.body}</svg>`;
+  } else {
+    const txt = initials(lang.name);
+    core = `<text y="${f2(k * 0.17)}" text-anchor="middle" font-size="${f2(k * (txt.length > 2 ? 0.36 : 0.46))}" font-weight="700" fill="${lang.color}" stroke="#fff" stroke-opacity=".25" stroke-width=".6">${esc(txt)}</text>`;
+  }
+  const sway = `style="animation-duration:${f2(5 + (i % 3) * 1.3)}s;animation-delay:${f2(-i * 1.7)}s"`;
+  return `<g class="sw" ${sway}>${core}</g>` + (showLabel ? label(lang, k / 2 + 11, T) : '');
+}
+
 /**
  * @param {{name:string,share:number,color:string,icon:{viewBox:string,body:string}|null}[]} languages
  */
-export function renderPlanets(languages, { RS, R_OUT, TILT, CX, CY, T, rnd, labels = true }) {
+export function renderPlanets(languages, { RS, R_OUT, TILT, CX, CY, T, rnd, labels = true, style = 'logos' }) {
   if (!languages?.length) return { css: '', defs: '', back: '', front: '' };
   const n = languages.length;
   const maxShare = Math.max(...languages.map((l) => l.share));
@@ -60,8 +79,10 @@ export function renderPlanets(languages, { RS, R_OUT, TILT, CX, CY, T, rnd, labe
   let css =
     `.pv{animation:pv linear infinite}.bk{animation:bk linear infinite}` +
     `@keyframes pv{0%,49.6%{opacity:1}50%,99.6%{opacity:0}100%{opacity:1}}` +
-    `@keyframes bk{0%,49.6%{opacity:0}50%,99.6%{opacity:1}100%{opacity:0}}`;
-  let defs = `<radialGradient id="shade" cx="35%" cy="30%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>`;
+    `@keyframes bk{0%,49.6%{opacity:0}50%,99.6%{opacity:1}100%{opacity:0}}` +
+    `.sw{animation:sw ease-in-out infinite alternate}@keyframes sw{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}`;
+  let defs = `<radialGradient id="shade" cx="35%" cy="30%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>` +
+    `<radialGradient id="lh"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>`;
   let back = '';
   let front = '';
 
@@ -86,7 +107,7 @@ export function renderPlanets(languages, { RS, R_OUT, TILT, CX, CY, T, rnd, labe
       `<radialGradient id="pg${i}"><stop offset=".35" stop-color="${lang.color}" stop-opacity=".45"/><stop offset="1" stop-color="${lang.color}" stop-opacity="0"/></radialGradient>` +
       `<radialGradient id="pf${i}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".4" stop-color="${lang.color}"/><stop offset="1" stop-color="#05070d"/></radialGradient>`;
 
-    const body = planetBody(lang, s, i, T, labels);
+    const body = (style === 'planets' ? planetBody : logoBody)(lang, s, i, T, labels);
     const vis = `style="animation-duration:${f2(period)}s;animation-delay:${f2(dx)}s"`;
     const wrap = (cls) =>
       `<g transform="translate(${CX} ${CY})"><g class="x${i}"><g class="y${i}"><g class="${cls}" ${vis}>${body}</g></g></g></g>`;

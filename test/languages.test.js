@@ -58,3 +58,12 @@ test('disk mode is unchanged when no languages are given', () => {
   assert.doesNotMatch(svg, /class="pv"/);
 });
 
+test('logos style (default) has no planet discs; planets style keeps them', () => {
+  const languages = demoLanguages({ limit: 3 }).map((l) => ({ ...l, icon: sanitizeIcon(FIXTURE, 'ci0') }));
+  const logos = renderSVG(demoData({ today }), { languages });
+  assert.match(logos, /class="sw"/);
+  assert.doesNotMatch(logos, /url\(#pg0\)/);
+  const planets = renderSVG(demoData({ today }), { languages, style: 'planets' });
+  assert.match(planets, /url\(#pg0\)/);
+});
+

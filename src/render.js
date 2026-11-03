@@ -77,7 +77,7 @@ const shortDate = (d) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(
 
 /**
  * @param {{ user: string, weeks: {date:string,count:number}[][], repos?: number }} data
- * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean }} [opts]
+ * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean, style?: 'logos'|'planets' }} [opts]
  *   languages: from withIcons(topLanguages(...)) — turns on the planets mode.
  */
 export function renderSVG(data, opts = {}) {
@@ -175,6 +175,7 @@ export function renderSVG(data, opts = {}) {
   const planets = renderPlanets(opts.languages, {
     RS, R_OUT, TILT, CX, CY, T, rnd,
     labels: opts.labels !== false,
+    style: opts.style === 'planets' ? 'planets' : 'logos',
   });
   const planetMode = Boolean(opts.languages?.length);
 
@@ -229,11 +230,12 @@ ${planets.css}
 <clipPath id="upper"><rect x="0" y="0" width="${W}" height="${CY}"/></clipPath>
 <clipPath id="frame"><rect width="${W}" height="${H}" rx="14"/></clipPath>
 ${planets.defs}
+<filter id="lshadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.4"/><feOffset dy="1.5"/><feComponentTransfer><feFuncA type="linear" slope=".65"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
 <g clip-path="url(#frame)">
 <rect width="${W}" height="${H}" fill="url(#bg)"/>
 <g>${stars}</g>
-<g font-family="${font}">${planets.back}</g>
+<g font-family="${font}" filter="url(#lshadow)">${planets.back}</g>
 <g mask="url(#doppler)" opacity="${f2(0.55 + 0.45 * recentGlow)}">
 <path d="${topArc}" fill="url(#lens)" filter="url(#soft)"/>
 <path d="${bottomArc}" fill="url(#lens)" filter="url(#soft)" opacity="0.6"/>
@@ -246,7 +248,7 @@ ${planets.defs}
 ${rings}
 </g></g></g>
 <circle cx="${CX}" cy="${CY}" r="${f2(RS)}" fill="#000" clip-path="url(#upper)"/>
-<g font-family="${font}">${planets.front}</g>
+<g font-family="${font}" filter="url(#lshadow)">${planets.front}</g>
 <g font-family="${font}">
 <text x="28" y="38" fill="${T.muted}" font-size="11" letter-spacing="3.5">COMMIT HORIZON</text>
 <text x="${W - 28}" y="38" fill="${T.text}" font-size="13" text-anchor="end">@${esc(data.user)}</text>

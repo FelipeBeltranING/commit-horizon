@@ -13,6 +13,7 @@ const { values } = parseArgs({
     user: { type: 'string', short: 'u' },
     theme: { type: 'string', short: 't', default: 'color' },
     mode: { type: 'string', short: 'm', default: 'disk' },
+    style: { type: 'string', default: 'logos' },
     langs: { type: 'string', default: '6' },
     exclude: { type: 'string', default: '' },
     'no-labels': { type: 'boolean', default: false },
@@ -32,6 +33,7 @@ Usage:
 Options:
   --theme color|bw          color palette (default color)
   --mode disk|languages     languages = your top languages orbit as planets
+  --style logos|planets     floating logos (default) or logos inside planets
   --langs 6                 how many languages in orbit (1-8)
   --exclude "HTML,CSS"      languages to leave out
   --no-labels               hide "Python 24%" under each planet
@@ -61,7 +63,7 @@ try {
     const missing = languages.filter((l) => !l.icon).map((l) => l.name);
     if (missing.length) console.warn(`ⓘ no logo for: ${missing.join(', ')} (run npm install, or they show initials)`);
   }
-  const svg = renderSVG(data, { theme: values.theme, languages, labels: !values['no-labels'] });
+  const svg = renderSVG(data, { theme: values.theme, languages, style: values.style, labels: !values['no-labels'] });
   await mkdir(dirname(values.out), { recursive: true });
   await writeFile(values.out, svg);
   console.log(`✔ ${values.out} (${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB)`);
