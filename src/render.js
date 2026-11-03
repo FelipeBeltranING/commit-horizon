@@ -2,6 +2,7 @@
 // No JavaScript inside the SVG (GitHub strips it): only CSS keyframes.
 import { hashString, mulberry32 } from './prng.js';
 import { computeStats } from './stats.js';
+import { renderPlanets } from './planets.js';
 
 const W = 840;
 const H = 440;
@@ -76,7 +77,8 @@ const shortDate = (d) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(
 
 /**
  * @param {{ user: string, weeks: {date:string,count:number}[][], repos?: number }} data
- * @param {{ theme?: 'color'|'bw' }} [opts]
+ * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean }} [opts]
+ *   languages: from withIcons(topLanguages(...)) — turns on the planets mode.
  */
 export function renderSVG(data, opts = {}) {
   const theme = THEMES[opts.theme] ? opts.theme : 'color';
@@ -169,6 +171,13 @@ export function renderSVG(data, opts = {}) {
   const inner = R_IN / hazeR;
   const edge = (RS * 0.98) / hazeR;
 
+  // ---------- language planets (optional mode) ----------
+  const planets = renderPlanets(opts.languages, {
+    RS, R_OUT, TILT, CX, CY, T, rnd,
+    labels: opts.labels !== false,
+  });
+  const planetMode = Boolean(opts.languages?.length);
+
   // ---------- labels ----------
   const total = stats.total.toLocaleString('en-US');
   const bestTxt = stats.best ? `best ${shortDate(stats.best.date)} (${stats.best.count})` : 'best —';
@@ -191,6 +200,7 @@ export function renderSVG(data, opts = {}) {
 @keyframes pulse{0%,100%{opacity:.15}50%{opacity:1}}
 .pr{animation:breathe 5s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:${f2(streakGlow * 0.75)}}50%{opacity:${f2(streakGlow)}}}
+${planets.css}
 @media (prefers-reduced-motion:reduce){*{animation-play-state:paused!important}}
 </style>
 <defs>
@@ -218,10 +228,12 @@ export function renderSVG(data, opts = {}) {
 <clipPath id="lensClip"><path d="${topArc}"/><path d="${bottomArc}"/></clipPath>
 <clipPath id="upper"><rect x="0" y="0" width="${W}" height="${CY}"/></clipPath>
 <clipPath id="frame"><rect width="${W}" height="${H}" rx="14"/></clipPath>
+${planets.defs}
 </defs>
 <g clip-path="url(#frame)">
 <rect width="${W}" height="${H}" fill="url(#bg)"/>
 <g>${stars}</g>
+<g font-family="${font}">${planets.back}</g>
 <g mask="url(#doppler)" opacity="${f2(0.55 + 0.45 * recentGlow)}">
 <path d="${topArc}" fill="url(#lens)" filter="url(#soft)"/>
 <path d="${bottomArc}" fill="url(#lens)" filter="url(#soft)" opacity="0.6"/>
@@ -229,16 +241,17 @@ export function renderSVG(data, opts = {}) {
 </g>
 <circle cx="${CX}" cy="${CY}" r="${f2(RS)}" fill="#000"/>
 <circle class="pr" cx="${CX}" cy="${CY}" r="${f2(RS * 1.025)}" fill="none" stroke="${T.ring}" stroke-width="1.4" filter="url(#glow)"/>
-<g mask="url(#doppler)"><g filter="url(#glow)"><g transform="translate(${CX} ${CY}) scale(1 ${TILT})">
+<g mask="url(#doppler)" opacity="${planetMode ? 0.8 : 1}"><g filter="url(#glow)"><g transform="translate(${CX} ${CY}) scale(1 ${TILT})">
 <circle r="${f2(hazeR)}" fill="url(#haze)"/>
 ${rings}
 </g></g></g>
 <circle cx="${CX}" cy="${CY}" r="${f2(RS)}" fill="#000" clip-path="url(#upper)"/>
+<g font-family="${font}">${planets.front}</g>
 <g font-family="${font}">
 <text x="28" y="38" fill="${T.muted}" font-size="11" letter-spacing="3.5">COMMIT HORIZON</text>
 <text x="${W - 28}" y="38" fill="${T.text}" font-size="13" text-anchor="end">@${esc(data.user)}</text>
 <text x="28" y="${H - 30}" fill="${T.text}" font-size="22" font-weight="700">${esc(total)}</text>
-<text x="28" y="${H - 14}" fill="${T.muted}" font-size="10.5" letter-spacing="1">CONTRIBUTIONS FALLING IN · LAST 12 MONTHS</text>
+<text x="28" y="${H - 14}" fill="${T.muted}" font-size="10.5" letter-spacing="1">${planetMode ? 'CONTRIBUTIONS · TOP LANGUAGES IN ORBIT' : 'CONTRIBUTIONS FALLING IN · LAST 12 MONTHS'}</text>
 <text x="${W - 28}" y="${H - 14}" fill="${T.muted}" font-size="10.5" text-anchor="end">${esc(streakTxt)}</text>
 </g>
 </g>
