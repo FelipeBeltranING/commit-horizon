@@ -13,19 +13,23 @@ async function load(user) {
   // Re-import on each request so edits to src/ show up without restarting.
   const bust = `?t=${Date.now()}`;
   const imp = (p) => import(pathToFileURL(resolve(p)).href + bust);
-  const [{ renderSVG }, { demoData }, { fetchUserData }] = await Promise.all([
-    imp('src/render.js'),
-    imp('src/demo.js'),
-    imp('src/github.js'),
-  ]);
-  if (!user) return { renderSVG, data: demoData() };
+  const [{ renderSVG }, { demoData }, { fetchUserData }, { withIcons }, { demoLanguages, fetchLanguages }] =
+    await Promise.all([
+      imp('src/render.js'),
+      imp('src/demo.js'),
+      imp('src/github.js'),
+      imp('src/icons.js'),
+      imp('src/languages.js'),
+    ]);
+  if (!user) return { renderSVG, data: demoData(), languages: withIcons(demoLanguages()) };
 
   let hit = cache.get(user);
   if (!hit || Date.now() - hit.at > 10 * 60 * 1000) {
-    hit = { at: Date.now(), data: await fetchUserData(user) };
+    const [data, langs] = await Promise.all([fetchUserData(user), fetchLanguages(user)]);
+    hit = { at: Date.now(), data, langs };
     cache.set(user, hit);
   }
-  return { renderSVG, data: hit.data };
+  return { renderSVG, data: hit.data, languages: withIcons(hit.langs) };
 }
 
 createServer(async (req, res) => {
@@ -34,9 +38,11 @@ createServer(async (req, res) => {
   try {
     if (url.pathname === '/hole.svg') {
       const theme = url.searchParams.get('theme') === 'bw' ? 'bw' : 'color';
-      const { renderSVG, data } = await load(user);
+      const mode = url.searchParams.get('mode') === 'languages' ? 'languages' : 'disk';
+      const { renderSVG, data, languages } = await load(user);
       res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' });
-      return res.end(renderSVG(data, { theme }));
+      const langOpts = mode === 'languages' ? { languages } : {};
+      return res.end(renderSVG(data, { theme, ...langOpts }));
     }
     if (url.pathname === '/') {
       const q = user ? `user=${encodeURIComponent(user)}&` : '';
@@ -46,6 +52,7 @@ createServer(async (req, res) => {
         previewPage({
           color: `/hole.svg?${q}theme=color&t=${t}`,
           bw: `/hole.svg?${q}theme=bw&t=${t}`,
+          languages: `/hole.svg?${q}mode=languages&t=${t}`,
           user,
           live: true,
         }),

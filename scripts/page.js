@@ -1,5 +1,5 @@
 // The preview page: shows both themes on a dark and a light "README".
-export function previewPage({ color, bw, user = '', live = false }) {
+export function previewPage({ color, bw, languages, user = '', live = false }) {
   const form = live
     ? `<form method="get">
   <input name="user" placeholder="github user (empty = demo)" value="${user === 'demo-astronaut' ? '' : user}">
@@ -24,6 +24,7 @@ button{background:#238636;color:#fff;border:0;border-radius:6px;padding:8px 14px
 <body><main>
 <h1>COMMIT HORIZON · preview</h1>
 ${form}
+${languages ? `<h2>LANGUAGES IN ORBIT · README DARK</h2><img src="${languages}" alt="Commit Horizon languages">` : ''}
 <h2>COLOR · README DARK</h2><img src="${color}" alt="Commit Horizon color">
 <h2>INTERSTELLAR B&amp;W · README DARK</h2><img src="${bw}" alt="Commit Horizon black and white">
 <h2>COLOR · README LIGHT</h2><div class="light"><img src="${color}" alt=""></div>

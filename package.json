@@ -1,7 +1,7 @@
 {
   "name": "commit-horizon",
   "version": "0.1.0",
-  "description": "Your GitHub year spiraling into a black hole — an animated SVG for your profile README.",
+  "description": "Your GitHub year spiraling into a black hole (and your languages orbiting it) — animated SVGs for your profile README.",
   "type": "module",
   "bin": {
     "commit-horizon": "bin/commit-horizon.js"
@@ -9,7 +9,8 @@
   "scripts": {
     "demo": "node scripts/demo.js",
     "preview": "node scripts/preview.js",
-    "test": "node --test"
+    "test": "node --test",
+    "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out out/commit-horizon-languages.svg"
   },
   "engines": {
     "node": ">=18"
@@ -23,5 +24,8 @@
     "black-hole",
     "space"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "optionalDependencies": {
+    "devicon": "^2.16.0"
+  }
 }
