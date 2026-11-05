@@ -58,6 +58,34 @@ test('disk mode is unchanged when no languages are given', () => {
   assert.doesNotMatch(svg, /class="pv"/);
 });
 
+test('fetchLanguages without token: one request, forks skipped, clear rate-limit error', async () => {
+  const { fetchLanguages } = await import('../src/languages.js');
+  const realFetch = globalThis.fetch;
+  let calls = 0;
+  try {
+    globalThis.fetch = async () => {
+      calls++;
+      return new Response(
+        JSON.stringify([
+          { fork: false, language: 'Python', size: 300 },
+          { fork: false, language: 'GDScript', size: 100 },
+          { fork: true, language: 'Rust', size: 9000 },
+          { fork: false, language: null, size: 50 },
+        ]),
+        { status: 200 },
+      );
+    };
+    const langs = await fetchLanguages('someone', { token: '' });
+    assert.equal(calls, 1);
+    assert.deepEqual(langs.map((l) => l.name), ['Python', 'GDScript']);
+
+    globalThis.fetch = async () => new Response('{}', { status: 403 });
+    await assert.rejects(fetchLanguages('someone', { token: '' }), /rate limit/);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
 test('logos style (default) has no planet discs; planets style keeps them', () => {
   const languages = demoLanguages({ limit: 3 }).map((l) => ({ ...l, icon: sanitizeIcon(FIXTURE, 'ci0') }));
   const logos = renderSVG(demoData({ today }), { languages });
