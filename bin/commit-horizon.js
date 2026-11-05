@@ -60,6 +60,7 @@ try {
   if (values.mode === 'languages') {
     const opts = { limit: Math.min(8, Math.max(1, Number(values.langs) || 6)), exclude: values.exclude.split(',') };
     languages = withIcons(values.demo ? demoLanguages(opts) : await fetchLanguages(user, opts));
+    if (!languages.length) console.warn(`ⓘ no languages found for ${user} (only forks, or repos without code)`);
     const missing = languages.filter((l) => !l.icon).map((l) => l.name);
     if (missing.length) console.warn(`ⓘ no logo for: ${missing.join(', ')} (run npm install, or they show initials)`);
   }

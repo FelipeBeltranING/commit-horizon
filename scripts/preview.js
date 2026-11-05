@@ -21,15 +21,27 @@ async function load(user) {
       imp('src/icons.js'),
       imp('src/languages.js'),
     ]);
-  if (!user) return { renderSVG, data: demoData(), languages: withIcons(demoLanguages()) };
+  if (!user) return { renderSVG, data: demoData(), languages: withIcons(demoLanguages()), langError: null };
 
+  // The page loads 3 images at once: share ONE in-flight fetch per user so we
+  // don't triple the GitHub requests (and hit the 60/hour unauthenticated limit).
   let hit = cache.get(user);
   if (!hit || Date.now() - hit.at > 10 * 60 * 1000) {
-    const [data, langs] = await Promise.all([fetchUserData(user), fetchLanguages(user)]);
-    hit = { at: Date.now(), data, langs };
+    const promise = Promise.all([
+      fetchUserData(user),
+      fetchLanguages(user).then(
+        (langs) => ({ langs, langError: langs.length ? null : 'no languages found in public non-fork repos' }),
+        (err) => ({ langs: [], langError: err.message }),
+      ),
+    ]);
+    hit = { at: Date.now(), promise };
     cache.set(user, hit);
+    promise
+      .then(([, l]) => l.langError && console.warn(`ⓘ languages for ${user}: ${l.langError}`))
+      .catch(() => cache.delete(user));
   }
-  return { renderSVG, data: hit.data, languages: withIcons(hit.langs) };
+  const [data, { langs, langError }] = await hit.promise;
+  return { renderSVG, data, languages: withIcons(langs), langError };
 }
 
 createServer(async (req, res) => {
@@ -39,9 +51,9 @@ createServer(async (req, res) => {
     if (url.pathname === '/hole.svg') {
       const theme = url.searchParams.get('theme') === 'bw' ? 'bw' : 'color';
       const mode = url.searchParams.get('mode') === 'languages' ? 'languages' : 'disk';
-      const { renderSVG, data, languages } = await load(user);
+      const { renderSVG, data, languages, langError } = await load(user);
       res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' });
-      const langOpts = mode === 'languages' ? { languages } : {};
+      const langOpts = mode === 'languages' ? { languages, note: langError && `languages: ${langError}` } : {};
       return res.end(renderSVG(data, { theme, ...langOpts }));
     }
     if (url.pathname === '/') {
