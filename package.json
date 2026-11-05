@@ -1,6 +1,6 @@
 {
   "name": "commit-horizon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Your GitHub year spiraling into a black hole (and your languages orbiting it) — animated SVGs for your profile README.",
   "type": "module",
   "bin": {
