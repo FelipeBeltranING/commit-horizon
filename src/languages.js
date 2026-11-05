@@ -80,18 +80,21 @@ export async function fetchLanguages(user, { token = process.env.GITHUB_TOKEN, .
       for (const e of repo.languages.edges) add(e.node.name, e.size);
     }
   } else {
+    // Unauthenticated REST is limited to 60 requests/hour, so use a single request:
+    // each repo's main language, weighted by the repo size. With GITHUB_TOKEN the
+    // GraphQL path above counts the exact bytes of every language instead.
     const res = await fetch(`https://api.github.com/users/${user}/repos?per_page=100&type=owner&sort=pushed`, {
       headers: UA,
     });
+    if (res.status === 403 || res.status === 429) {
+      throw new Error('GitHub rate limit reached (60 requests/hour without a token) — set GITHUB_TOKEN or wait');
+    }
+    if (res.status === 404) throw new Error(`user not found: ${user}`);
     if (!res.ok) throw new Error(`GitHub repos ${res.status}`);
-    const repos = (await res.json()).filter((r) => !r.fork).slice(0, 30);
-    await Promise.all(
-      repos.map(async (r) => {
-        const lr = await fetch(r.languages_url, { headers: UA });
-        if (!lr.ok) return;
-        for (const [name, n] of Object.entries(await lr.json())) add(name, n);
-      }),
-    );
+    for (const r of await res.json()) {
+      if (r.fork || !r.language) continue;
+      add(r.language, Math.max(1, r.size) * 1024);
+    }
   }
   return topLanguages(bytes, opts);
 }

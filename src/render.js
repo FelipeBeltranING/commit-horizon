@@ -77,7 +77,7 @@ const shortDate = (d) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(
 
 /**
  * @param {{ user: string, weeks: {date:string,count:number}[][], repos?: number }} data
- * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean, style?: 'logos'|'planets' }} [opts]
+ * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean, note?: string, style?: 'logos'|'planets' }} [opts]
  *   languages: from withIcons(topLanguages(...)) — turns on the planets mode.
  */
 export function renderSVG(data, opts = {}) {
@@ -252,6 +252,7 @@ ${rings}
 <g font-family="${font}">
 <text x="28" y="38" fill="${T.muted}" font-size="11" letter-spacing="3.5">COMMIT HORIZON</text>
 <text x="${W - 28}" y="38" fill="${T.text}" font-size="13" text-anchor="end">@${esc(data.user)}</text>
+${opts.note ? `<text x="${W - 28}" y="56" fill="${T.muted}" font-size="10" text-anchor="end">${esc(opts.note)}</text>` : ''}
 <text x="28" y="${H - 30}" fill="${T.text}" font-size="22" font-weight="700">${esc(total)}</text>
 <text x="28" y="${H - 14}" fill="${T.muted}" font-size="10.5" letter-spacing="1">${planetMode ? 'CONTRIBUTIONS · TOP LANGUAGES IN ORBIT' : 'CONTRIBUTIONS FALLING IN · LAST 12 MONTHS'}</text>
 <text x="${W - 28}" y="${H - 14}" fill="${T.muted}" font-size="10.5" text-anchor="end">${esc(streakTxt)}</text>
