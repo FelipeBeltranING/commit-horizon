@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // GitHub linguist name -> devicon folder
 export const DEVICON_SLUGS = {
@@ -51,8 +52,17 @@ function iconsRoot() {
   }
 }
 
+// Your own logos win: icons/<slug>.svg or icons/<slug>.png (e.g. icons/python.png).
+const LOCAL_ICONS = fileURLToPath(new URL('../icons/', import.meta.url));
+
 export function loadIcon(language, prefix) {
   const slug = DEVICON_SLUGS[language] ?? language.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  for (const dir of [LOCAL_ICONS, process.env.COMMIT_HORIZON_ICONS].filter(Boolean)) {
+    const svg = join(dir, `${slug}.svg`);
+    if (existsSync(svg)) return sanitizeIcon(readFileSync(svg, 'utf8'), prefix);
+    const png = join(dir, `${slug}.png`);
+    if (existsSync(png)) return pngIcon(readFileSync(png));
+  }
   const root = iconsRoot();
   if (!root) return null;
   for (const variant of ['original', 'plain', 'original-wordmark']) {
@@ -60,6 +70,18 @@ export function loadIcon(language, prefix) {
     if (existsSync(file)) return sanitizeIcon(readFileSync(file, 'utf8'), prefix);
   }
   return null;
+}
+
+/** Embeds a PNG as a data URI (GitHub blocks external images inside SVGs, not data URIs). */
+export function pngIcon(buf) {
+  const isPng = buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47;
+  if (!isPng) return null;
+  const w = buf.readUInt32BE(16);
+  const h = buf.readUInt32BE(20);
+  return {
+    viewBox: `0 0 ${w} ${h}`,
+    body: `<image width="${w}" height="${h}" href="data:image/png;base64,${buf.toString('base64')}"/>`,
+  };
 }
 
 /** Returns { viewBox, body } with ids and classes namespaced by `prefix`. */

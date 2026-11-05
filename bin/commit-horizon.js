@@ -40,7 +40,7 @@ Options:
   --out file.svg
 
 Set GITHUB_TOKEN to use the GraphQL API (otherwise public endpoints are used).
-Logos come from the devicon package (npm install).`);
+Logos: icons/<language>.svg|png first (e.g. icons/python.png), then the devicon package (npm install).`);
   process.exit(values.help ? 0 : 1);
 }
 

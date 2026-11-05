@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sanitizeIcon } from '../src/icons.js';
+import { pngIcon, sanitizeIcon } from '../src/icons.js';
 import { demoLanguages, topLanguages } from '../src/languages.js';
 import { demoData } from '../src/demo.js';
 import { renderSVG } from '../src/render.js';
@@ -67,3 +67,14 @@ test('logos style (default) has no planet discs; planets style keeps them', () =
   assert.match(planets, /url\(#pg0\)/);
 });
 
+test('pngIcon embeds a PNG as a data URI with its size', () => {
+  // 1x1 transparent PNG
+  const buf = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const icon = pngIcon(buf);
+  assert.equal(icon.viewBox, '0 0 1 1');
+  assert.match(icon.body, /href="data:image\/png;base64,/);
+  assert.equal(pngIcon(Buffer.from('not a png at all, nope')), null);
+});
