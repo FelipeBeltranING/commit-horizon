@@ -14,7 +14,7 @@ edge, about to cross.
 [![Node 18+](https://img.shields.io/badge/node-18%2B-3d72bd)](package.json)
 [![No dependencies](https://img.shields.io/badge/dependencies-0-0e8a16)](package.json)
 
-**[🔭 Try it](#try-it-1-minute)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
+**[🚀 Use the GitHub Action](#put-a-black-hole-in-your-readme-2-minutes)** · **[🔭 Run it locally](#run-it-locally)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
 
 </div>
 
@@ -66,27 +66,94 @@ language I use".
 | Temperature gradient, white-blue core to red outer disk | Black and white, *Interstellar* style |
 | <img src="examples/commit-horizon-color.svg" alt="color theme" width="100%"> | <img src="examples/commit-horizon-bw.svg" alt="black and white theme" width="100%"> |
 
-## Try it (1 minute)
+## Put a black hole in your README (2 minutes)
 
-No setup yet for the README itself (the GitHub Action and the web generator are next on the
-[roadmap](#roadmap)), but you can render yours locally. Requires Node 18+, no required dependencies.
+**1.** In your profile repo (`your-username/your-username`), create `.github/workflows/commit-horizon.yml`
+(or copy [`examples/commit-horizon.yml`](examples/commit-horizon.yml)):
+
+```yaml
+name: Commit Horizon
+
+on:
+  schedule:
+    - cron: "23 4 * * *" # every day
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  black-hole:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: FelipeBeltranING/commit-horizon@v0
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          output: dist/commit-horizon.svg
+          timezone: America/Bogota   # your IANA time zone, so your streak follows your day
+          # mode: languages          # put your top languages in orbit
+          # theme: bw                # black and white, Interstellar style
+          # background: transparent  # float on your README instead of a dark card
+
+      - uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**2.** Run it once from the **Actions** tab (or wait for the daily run).
+
+**3.** Add this to your `README.md`:
+
+```md
+![My black hole](https://raw.githubusercontent.com/your-username/your-username/output/commit-horizon.svg)
+```
+
+That's it: your year falls a little further in every day. The job summary shows your total, streaks
+and best day, and the step outputs `svg`, `total` and `streak` for anything else you want to do.
+
+### Inputs
+
+| Input | Default | Description |
+| --- | --- | --- |
+| `github_user_name` | repo owner | Whose year falls into the hole |
+| `github_token` | `github.token` | Used for the GraphQL API (exact counts and bytes per language) |
+| `output` | `dist/commit-horizon.svg` | Where the SVG is written |
+| `theme` | `color` | `color` or `bw` |
+| `background` | `space` | `space` or `transparent` |
+| `mode` | `disk` | `disk` or `languages` |
+| `style` | `logos` | `logos` or `planets` (languages mode) |
+| `langs` | `6` | Languages in orbit, 1–8 |
+| `exclude` | | Languages to leave out, e.g. `HTML,CSS` |
+| `labels` | `true` | Show `Python 24%` under each logo |
+| `timezone` | `UTC` | Your IANA time zone; runners use UTC, so set it or your streak may break at night |
+| `demo` | `false` | Fake data, for previews |
+
+### Live example
+
+The author's black hole, regenerated every day by this repo's own workflow
+([`black-hole.yml`](.github/workflows/black-hole.yml)) with `uses: ./`:
+
+<img src="https://raw.githubusercontent.com/FelipeBeltranING/commit-horizon/output/commit-horizon-languages.svg" alt="FelipeBeltranING's black hole with languages in orbit, regenerated daily" width="100%">
+
+## Run it locally
+
+Requires Node 18+, no dependencies.
 
 ```bash
 git clone https://github.com/FelipeBeltranING/commit-horizon.git && cd commit-horizon
 node bin/commit-horizon.js --user your-username --out out/me.svg
 node bin/commit-horizon.js --user your-username --mode languages --out out/me-langs.svg
-```
-
-Then commit `out/me.svg` to your profile repo and add `![My black hole](me.svg)` to its README.
-
-```bash
-npm install         # optional: devicon, the language logos
 npm run preview     # live preview at http://localhost:4321/?user=your-username
 npm run demo        # regenerate examples/*.svg (fake data, no network)
 npm test
 ```
 
-## Options
+## CLI options
 
 | Flag | Default | Description |
 | --- | --- | --- |
@@ -107,8 +174,8 @@ bytes per language. Without one, the public contributions page is read and langu
 approximated from each repo's main language (1 request, so you stay under the 60/hour limit).
 
 **Time zones:** "today" is your local day. GitHub's public calendar is in UTC, so without this
-your streak would break every evening west of UTC. Pass `--timezone` when it runs somewhere
-else, like CI.
+your streak would break every evening west of UTC. The CLI uses your machine's zone; in the
+Action, set the `timezone` input.
 
 ## How it works
 
