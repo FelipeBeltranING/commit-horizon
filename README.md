@@ -2,6 +2,8 @@
 
 **Your GitHub year, spiraling into a black hole.**
 
+[![Tests](https://github.com/FelipeBeltranING/commit-horizon/actions/workflows/test.yml/badge.svg)](https://github.com/FelipeBeltranING/commit-horizon/actions/workflows/test.yml)
+
 An animated SVG for your profile README. Every day of the last year is a particle of
 light orbiting in the accretion disk: old days drift on the cold outer edge, recent
 days race near the event horizon, and **today** is right at the edge, about to cross.
