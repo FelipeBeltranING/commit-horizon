@@ -1,0 +1,25 @@
+name: 🌙 New celestial body
+description: Propose a new object in the sky (moon, comet, pulsar, probe…)
+labels: ["enhancement", "celestial-body"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What appears in the sky?
+      description: Describe the object and how it moves.
+      placeholder: A comet dives towards the hole for every PR merged in the last 30 days…
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: What GitHub data drives it?
+      description: Which numbers decide if it shows up, its size, speed or color?
+      placeholder: Merged PRs in the last 30 days (GraphQL, token path only)
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch or reference (optional)
+      description: A drawing, a photo from NASA, a frame from a movie…
