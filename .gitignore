@@ -1,6 +1,3 @@
 node_modules/
-out/*
-!out/commit-horizon-color.svg
-!out/commit-horizon-bw.svg
-!out/commit-horizon-languages.svg
+out/
 .DS_Store
