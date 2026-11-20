@@ -1,0 +1,32 @@
+# Save as .github/workflows/commit-horizon.yml in your profile repo (username/username)
+name: Commit Horizon
+
+on:
+  schedule:
+    - cron: "23 4 * * *" # every day
+  workflow_dispatch:      # run it by hand from the Actions tab
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  black-hole:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: FelipeBeltranING/commit-horizon@v0
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          output: dist/commit-horizon.svg
+          timezone: America/Bogota   # your IANA time zone, so your streak follows your day
+          # mode: languages          # put your top languages in orbit
+          # theme: bw                # black and white, Interstellar style
+          # background: transparent  # float on your README instead of a dark card
+
+      - uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

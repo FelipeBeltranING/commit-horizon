@@ -106,3 +106,11 @@ test('pngIcon embeds a PNG as a data URI with its size', () => {
   assert.match(icon.body, /href="data:image\/png;base64,/);
   assert.equal(pngIcon(Buffer.from('not a png at all, nope')), null);
 });
+
+test('every mapped language has a vendored logo, no npm install needed', async () => {
+  const { DEVICON_SLUGS } = await import('../src/icons.js');
+  const { existsSync } = await import('node:fs');
+  for (const slug of new Set(Object.values(DEVICON_SLUGS))) {
+    assert.ok(existsSync(new URL(`../icons/devicon/${slug}.svg`, import.meta.url)), `icons/devicon/${slug}.svg`);
+  }
+});

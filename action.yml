@@ -1,0 +1,65 @@
+name: "Commit Horizon Black Hole"
+description: "Your GitHub year spiraling into a black hole: an animated SVG for your profile README, with your languages in orbit."
+author: "David Felipe Beltrán Tabares"
+branding:
+  icon: "aperture"
+  color: "orange"
+inputs:
+  github_user_name:
+    description: "GitHub username whose year falls into the black hole."
+    required: false
+    default: ${{ github.repository_owner }}
+  github_token:
+    description: "Token used for the GraphQL API (exact contributions and bytes per language)."
+    required: false
+    default: ${{ github.token }}
+  output:
+    description: "Where to write the SVG."
+    required: false
+    default: "dist/commit-horizon.svg"
+  theme:
+    description: "color (temperature gradient) or bw (black and white, Interstellar style)."
+    required: false
+    default: "color"
+  background:
+    description: "space (dark card) or transparent (floats on your README)."
+    required: false
+    default: "space"
+  mode:
+    description: "disk, or languages to put your top languages in orbit around the hole."
+    required: false
+    default: "disk"
+  style:
+    description: "languages mode: logos (floating logos) or planets (logos inside planets)."
+    required: false
+    default: "logos"
+  langs:
+    description: "languages mode: how many languages in orbit (1-8)."
+    required: false
+    default: "6"
+  exclude:
+    description: "languages mode: comma-separated languages to leave out, e.g. HTML,CSS."
+    required: false
+    default: ""
+  labels:
+    description: "languages mode: show the 'Python 24%' labels (true/false)."
+    required: false
+    default: "true"
+  timezone:
+    description: "Your IANA time zone, e.g. America/Bogota, so 'today' (and your streak) is your local day. Runners use UTC."
+    required: false
+    default: "UTC"
+  demo:
+    description: "Render fake but believable data instead of a real account (for previews and tests)."
+    required: false
+    default: "false"
+outputs:
+  svg:
+    description: "Path of the generated SVG."
+  total:
+    description: "Contributions in the last 12 months."
+  streak:
+    description: "Current streak in days."
+runs:
+  using: "node24"
+  main: "src/action.js"

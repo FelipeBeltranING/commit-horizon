@@ -27,6 +27,8 @@ hit the 60 requests/hour limit).
 
 | File | What it does |
 | --- | --- |
+| `src/build.js` | The shared pipeline: validate options, fetch the data, render (used by the CLI, the Action and the web) |
+| `src/action.js` / `action.yml` | The GitHub Action |
 | `src/github.js` | Contribution calendar (GraphQL with a token, the public page without one) |
 | `src/stats.js` | Weeks, streaks, best day, the p95 scale, the user's local "today" |
 | `src/render.js` | The whole SVG: stars, disk, lensing, shadow, labels |

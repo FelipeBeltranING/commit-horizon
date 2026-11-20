@@ -54,10 +54,12 @@ function iconsRoot() {
 
 // Your own logos win: icons/<slug>.svg or icons/<slug>.png (e.g. icons/python.png).
 const LOCAL_ICONS = fileURLToPath(new URL('../icons/', import.meta.url));
+// Copies of the devicon logos we map (npm run vendor-icons), so no install is needed.
+const VENDORED_ICONS = fileURLToPath(new URL('../icons/devicon/', import.meta.url));
 
 export function loadIcon(language, prefix) {
   const slug = DEVICON_SLUGS[language] ?? language.toLowerCase().replace(/[^a-z0-9]+/g, '');
-  for (const dir of [LOCAL_ICONS, process.env.COMMIT_HORIZON_ICONS].filter(Boolean)) {
+  for (const dir of [LOCAL_ICONS, process.env.COMMIT_HORIZON_ICONS, VENDORED_ICONS].filter(Boolean)) {
     const svg = join(dir, `${slug}.svg`);
     if (existsSync(svg)) return sanitizeIcon(readFileSync(svg, 'utf8'), prefix);
     const png = join(dir, `${slug}.png`);

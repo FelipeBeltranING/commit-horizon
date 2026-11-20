@@ -1,0 +1,62 @@
+# Runs this repo's own Action (uses: ./) on every push and PR, and every day publishes the
+# author's black hole to the `output` branch: a live example and an end-to-end test in one.
+name: Black hole
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "41 5 * * *" # every day, after midnight in Bogotá
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Disk
+        id: disk
+        uses: ./
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          output: dist/commit-horizon.svg
+          timezone: America/Bogota
+
+      - name: Languages in orbit
+        uses: ./
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          output: dist/commit-horizon-languages.svg
+          mode: languages
+          timezone: America/Bogota
+
+      - name: Transparent, black and white
+        uses: ./
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          output: dist/commit-horizon-bw-transparent.svg
+          theme: bw
+          background: transparent
+          timezone: America/Bogota
+
+      - name: Check the outputs
+        run: |
+          test -s "${{ steps.disk.outputs.svg }}"
+          echo "total=${{ steps.disk.outputs.total }} streak=${{ steps.disk.outputs.streak }}"
+          ls -la dist
+
+      - name: Publish to the output branch
+        if: github.event_name != 'pull_request'
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+          keep_history: false
+          commit_message: "chore: regenerate the black hole"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
