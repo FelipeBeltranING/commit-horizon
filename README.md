@@ -242,7 +242,7 @@ The [issues](../../issues) and [milestones](../../milestones) are the roadmap:
 
 | Milestone | What's coming |
 | --- | --- |
-| [v0.3 · Launch pad](../../milestone/2) | 🚀 GitHub Action + Marketplace · 🌐 web generator · 🎞️ MP4/GIF export · 📏 calibrated disk for quieter years |
+| ✅ [v0.3 · Launch pad](../../milestone/2) | 🚀 GitHub Action · 🌐 web generator · 🎞️ video export · 📏 calibrated disk · 🌗 transparent background |
 | [v0.4 · Celestial events](../../milestone/3) | 🌙 moons for streaks · ☄️ comets for merged PRs · 💥 supernova on your best day · 📡 pulsar for night owls · 🛰️ Voyager probe |
 | [v0.5 · New universes](../../milestone/4) | 🌌 galaxy mode · ☀️ solar system mode · 🕳️🕳️ two black holes merging |
 
