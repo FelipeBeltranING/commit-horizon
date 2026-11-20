@@ -1,0 +1,120 @@
+{
+  "labels": [
+    { "name": "iteration-1", "color": "f0a35e", "description": "Iteration 1: first light (the disk and languages in orbit)" },
+    { "name": "iteration-2", "color": "3d72bd", "description": "Iteration 2: launch pad (Action, web generator, video)" },
+    { "name": "iteration-3", "color": "8a63d2", "description": "Iteration 3: celestial events (moons, comets, supernovas)" },
+    { "name": "iteration-4", "color": "2b3a67", "description": "Iteration 4: new universes (galaxy, solar system, binaries)" },
+    { "name": "celestial-body", "color": "ffd28c", "description": "A new object in the sky: mostly SVG + CSS keyframes, little JavaScript" },
+    { "name": "physics", "color": "c9411c", "description": "Makes the space look (prettier-than-)real" },
+    { "name": "languages", "color": "3178c6", "description": "Languages in orbit and their logos" },
+    { "name": "customization", "color": "c99a3e", "description": "New inputs/options for users" },
+    { "name": "performance", "color": "0e8a16", "description": "SVG size and render cost" },
+    { "name": "accessibility", "color": "f143ab", "description": "Barrier affecting people with disabilities" }
+  ],
+  "milestones": [
+    { "title": "v0.3 · Launch pad", "description": "Anyone can put a black hole in their README in 2 minutes: GitHub Action, web generator and video export." },
+    { "title": "v0.4 · Celestial events", "description": "The sky reacts to how you code: moons, comets, a supernova, a pulsar and a probe." },
+    { "title": "v0.5 · New universes", "description": "Whole new ways to see your year: galaxy, solar system and two black holes merging." }
+  ],
+  "issues": [
+    {
+      "title": "🚀 GitHub Action + publish to the Marketplace",
+      "labels": ["enhancement", "iteration-2", "help wanted"],
+      "milestone": "v0.3 · Launch pad",
+      "body": "## Idea\nOne step in a profile repo and the black hole regenerates itself every day:\n\n```yaml\n- uses: FelipeBeltranING/commit-horizon@v1\n  with:\n    github_user_name: ${{ github.repository_owner }}\n    output: dist/commit-horizon.svg\n    # theme: color        # or bw\n    # mode: disk          # or languages\n```\n\n## Where to start\n- `action.yml` at the root with `runs.using: node24` and inputs that mirror the CLI flags (`theme`, `mode`, `style`, `langs`, `exclude`, `timezone`, `output`).\n- `src/action.js`: read the inputs from `INPUT_*` env vars, reuse `fetchUserData`, `fetchLanguages`, `withIcons` and `renderSVG`. No new dependencies.\n- `github.token` is enough for GraphQL, so the Action always gets exact counts.\n- An `examples/commit-horizon.yml` workflow that publishes to an `output` branch.\n\n## Done when\n- [ ] `action.yml` + `src/action.js` with a test for the input parsing\n- [ ] Example workflow in `examples/`\n- [ ] README section \"Put a black hole in your README (2 minutes)\"\n- [ ] `v1` tag and Marketplace listing"
+    },
+    {
+      "title": "🌐 Web generator: type a username, see your black hole",
+      "labels": ["enhancement", "iteration-2", "help wanted"],
+      "milestone": "v0.3 · Launch pad",
+      "body": "## Idea\nNo setup at all: a page where you type your username, pick theme and mode, watch the hole live and copy one Markdown line:\n\n```md\n![My black hole](https://<host>/api/hole?user=your-username&mode=languages)\n```\n\n## Where to start\n- `api/hole.js` (Vercel function): validate the query, call the same pipeline as `scripts/preview.js`, answer `image/svg+xml` with `Cache-Control: s-maxage=14400`.\n- `public/index.html` + `public/app.js`: input, theme/mode/style pickers, live `<img>` preview and a copy button.\n- Optional `GITHUB_TOKEN` env var for higher limits.\n\n## Done when\n- [ ] `/api/hole` with tests for bad input (invalid user, unknown theme)\n- [ ] Page works on mobile\n- [ ] README links to the live generator"
+    },
+    {
+      "title": "🎞️ Record the black hole as MP4/GIF for sharing",
+      "labels": ["enhancement", "iteration-2"],
+      "milestone": "v0.3 · Launch pad",
+      "body": "Animated SVGs don't play on Reddit, X or Discord. A small recorder would let people share their black hole anywhere.\n\n## Where to start\n- `tools/record.mjs`: open the SVG in headless Chromium (Playwright, dev dependency only), take N frames with `page.screenshot`, pipe them to ffmpeg.\n- The longest orbit sets the loop length: pick `--seconds` so the inner disk does at least one full turn.\n\n## Done when\n- [ ] `node tools/record.mjs out/me.svg --out me.mp4` (and `.gif`) with `--fps`, `--width`, `--seconds`\n- [ ] README section \"Share it as a video\""
+    },
+    {
+      "title": "📏 Calibrate the disk for quieter years",
+      "labels": ["physics", "iteration-2"],
+      "milestone": "v0.3 · Launch pad",
+      "body": "With real data (≈800 contributions, ≈110 active days) the disk looks much thinner and fainter than the demo, which is tuned for a very busy year. Quieter years should still look like a proper black hole.\n\n## Ideas\n- Scale the base dust (`fill-opacity=\"0.12\"` for empty days in `src/render.js`) and the haze with `activeDays / 365`.\n- Give every active day a minimum size so a 1-contribution day is still visible at README size.\n- Compare side by side with `npm run preview` and `?user=` for a quiet, an average and a very busy account.\n\n## Done when\n- [ ] Before/after screenshots for 3 real accounts in the PR\n- [ ] The demo still looks the same (or better)"
+    },
+    {
+      "title": "🌗 Transparent background for light-mode READMEs",
+      "labels": ["customization", "good first issue", "iteration-2"],
+      "milestone": "v0.3 · Launch pad",
+      "body": "On a light README the dark card is fine, but some people want the black hole floating on their own background.\n\n## Steps\n1. Add `--background space|transparent` to `bin/commit-horizon.js` (default `space`).\n2. In `src/render.js`, skip the `url(#bg)` rect when it's `transparent`, and switch the labels to a mid-gray that reads on both themes.\n3. Add a test in `test/render.test.js` and preview it on the light card of `npm run preview`."
+    },
+    {
+      "title": "🌙 Moons for your streaks",
+      "labels": ["enhancement", "celestial-body", "iteration-3", "help wanted"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "## Idea\nEvery 7 days of **current** streak, a small moon joins the orbit (up to 5). If the streak breaks, the moons are gone… and the longest streak of the year leaves a faint ring where they used to be.\n\n| Current streak | Sky |\n| --- | --- |\n| 7 days | 🌙 one moon |\n| 14 days | 🌙🌙 two moons |\n| 35+ days | 🌙 × 5, the outer one with a tiny crater |\n\n## Where to start\n- `src/stats.js`: `moonsFor(currentStreak)` with a test.\n- Draw them with the same front/back trick as the language logos in `src/planets.js` so they pass behind the shadow.\n\n## Done when\n- [ ] Moons appear only past each threshold\n- [ ] They pass behind the hole on the far side\n- [ ] README table updated"
+    },
+    {
+      "title": "☄️ Comets for your merged pull requests",
+      "labels": ["enhancement", "celestial-body", "iteration-3", "help wanted"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "## Idea\nEach PR merged in the last 30 days is a comet that dives towards the hole with a tail pointing away from it. PRs to **other people's repos** come from farther away (longer, slower dive).\n\n## Where to start\n- GraphQL: `pullRequests(states: MERGED, last: 20)` with `mergedAt` and `repository.owner.login` (token path only; without a token, skip the comets).\n- Render: a `<path>` tail with a linear gradient + a head, animated along an ellipse with `offset-path`… or with the same X/Y sine trick used in `src/planets.js` if `offset-path` misbehaves on GitHub.\n- Cap at 8 comets to keep the SVG small.\n\n## Done when\n- [ ] Comets with own vs. external PRs\n- [ ] Test with a fake GraphQL response\n- [ ] SVG stays under 300 KB"
+    },
+    {
+      "title": "💥 Supernova on your best day",
+      "labels": ["enhancement", "celestial-body", "physics", "iteration-3"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "Today the best day gets a pulsing flare. Make it **explode** once per loop: a bright flash, an expanding shock ring and a slowly fading remnant, then back to the flare.\n\n## Steps\n1. In `src/render.js`, next to the `flare` circle, add a ring with a `@keyframes nova` that scales from 1 to ~6 and fades out (≈1 s out of a 12 s loop).\n2. Keep it on the same rotating `<g class=\"o\">` so it follows the orbit.\n3. Test: one and only one supernova per SVG."
+    },
+    {
+      "title": "📡 Pulsar for night owls",
+      "labels": ["enhancement", "celestial-body", "iteration-3"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "If most of your commits happen at night (20:00–05:00 in your `--timezone`), a pulsar appears in a corner of the sky, sweeping two thin beams like a lighthouse.\n\n## Where to start\n- Commit hours need GraphQL (`contributionsCollection.commitContributionsByRepository` → commits with `committedDate`). Sample the last 100 commits, that's enough.\n- Beams: two thin triangles with a radial gradient rotating with `@keyframes spin`."
+    },
+    {
+      "title": "🛰️ Voyager probe: days since your first commit",
+      "labels": ["enhancement", "celestial-body", "good first issue", "iteration-3"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "A tiny probe drifts slowly across the top of the sky with a label like `VOYAGER · 1,204 days out`.\n\n## Steps\n1. Get the account creation date (`createdAt` in GraphQL, `created_at` in REST) in `src/github.js`.\n2. In `src/render.js`, draw a small probe (a few `<rect>`s and a dish) that translates from left to right in ~60 s.\n3. Hide it if the label would collide with the stats in the corners.\n4. Test the day count with a fixed date."
+    },
+    {
+      "title": "✨ Constellations from your most starred repos",
+      "labels": ["enhancement", "celestial-body", "iteration-3"],
+      "milestone": "v0.4 · Celestial events",
+      "body": "The background stars are random today. Turn your 3–5 most starred repos into small constellations: one bright star per repo (brightness = stars), joined by faint lines, with the repo name on hover-less tiny text.\n\nKeep them out of the corners where the labels live (`inLabel` in `src/render.js`)."
+    },
+    {
+      "title": "🌌 Galaxy mode: one spiral arm per month",
+      "labels": ["enhancement", "iteration-4", "help wanted"],
+      "milestone": "v0.5 · New universes",
+      "body": "## Idea\n`--mode galaxy`: no black hole, a face-on spiral galaxy. Each month is an arm, each day a star on it, your busiest month the brightest arm, and the core glows with your current streak.\n\n## Where to start\n- New `src/galaxy.js` exporting `renderGalaxy(data, opts)`; reuse `computeStats`, the PRNG and the themes.\n- Logarithmic spiral: `r = a·e^(bθ)`, 12 arms offset by 30°.\n- The whole galaxy rotates slowly (one `<g>` with `@keyframes spin`).\n\n## Done when\n- [ ] `--mode galaxy` in the CLI and the preview\n- [ ] Deterministic, script-free and < 300 KB (same tests as the disk)"
+    },
+    {
+      "title": "☀️ Solar system mode: your repos as planets",
+      "labels": ["enhancement", "iteration-4"],
+      "milestone": "v0.5 · New universes",
+      "body": "`--mode solar`: a star in the middle (size = yearly total), and your top repos as planets — size by commits this year, color by main language, a ring for repos with stars, moons for open PRs."
+    },
+    {
+      "title": "🕳️🕳️ Binary black holes: two users merging",
+      "labels": ["enhancement", "iteration-4", "help wanted"],
+      "milestone": "v0.5 · New universes",
+      "body": "## Idea\n`--users alice,bob`: two black holes orbiting each other, each with its own disk, spiraling closer the more days you both contributed. Made for pair programmers, teams and study groups (semilleros 🎓).\n\n## Notes\n- Two disks at half scale, the barycenter weighted by yearly totals.\n- Shared active days could light up a bridge of matter between the two holes."
+    },
+    {
+      "title": "🔤 Logos for more languages",
+      "labels": ["languages", "good first issue"],
+      "body": "`DEVICON_SLUGS` in `src/icons.js` maps GitHub language names to devicon folders. Languages that aren't there fall back to initials.\n\n## Steps\n1. Check which of these exist in devicon: Nim, Gleam, Solidity, Elm, OCaml, Crystal, Perl, Groovy, Fortran, COBOL, Nix, Terraform (HCL).\n2. Add them to `DEVICON_SLUGS` (and to `LINGUIST_COLORS` in `src/languages.js` with their GitHub color).\n3. Preview: `node bin/commit-horizon.js --demo --mode languages --out out/x.svg` after editing `demoLanguages` locally.\n4. Add a test that every slug in the map resolves to a file when devicon is installed (skip if it isn't)."
+    },
+    {
+      "title": "🌑 Make dark logos readable in orbit (Rust, Shell, Lua, Assembly, Zig)",
+      "labels": ["languages", "good first issue", "accessibility"],
+      "body": "Dark logos get a faint white halo (`LIGHT_CORE` in `src/planets.js`), but nobody checked them at real README size yet.\n\n## Steps\n1. Render a demo with those languages and open it at 100% width on a dark README.\n2. Tune the halo (`#lh` gradient) or add a thin light stroke so each logo reads clearly.\n3. Attach before/after screenshots to the PR."
+    },
+    {
+      "title": "🇪🇸 Spanish labels inside the SVG",
+      "labels": ["customization", "good first issue"],
+      "body": "Add `--locale en|es` (default `en`) so the texts in the SVG can be in Spanish: `CONTRIBUCIONES CAYENDO · ÚLTIMOS 12 MESES`, `racha 9d · más larga 12d · mejor 18 oct (61)`.\n\n## Steps\n1. Move the label strings in `src/render.js` to a small `TEXTS = { en: {...}, es: {...} }` object (months included).\n2. Wire the flag in `bin/commit-horizon.js` and `?locale=` in `scripts/preview.js`.\n3. Test that `es` renders the Spanish strings and escapes them."
+    }
+  ]
+}
