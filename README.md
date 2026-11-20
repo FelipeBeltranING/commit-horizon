@@ -14,7 +14,7 @@ edge, about to cross.
 [![Node 18+](https://img.shields.io/badge/node-18%2B-3d72bd)](package.json)
 [![No runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-0-0e8a16)](package.json)
 
-**[🚀 Use the GitHub Action](#put-a-black-hole-in-your-readme-2-minutes)** · **[🌐 Web generator](#web-generator)** · **[🎞️ Share it as a video](#share-it-as-a-video)** · **[🔭 Run it locally](#run-it-locally)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
+**[🌐 Try it in your browser](https://commit-horizon.vercel.app)** · **[🚀 Use the GitHub Action](#put-a-black-hole-in-your-readme-2-minutes)** · **[🎞️ Share it as a video](#share-it-as-a-video)** · **[🔭 Run it locally](#run-it-locally)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
 
 </div>
 
@@ -142,17 +142,19 @@ The author's black hole, regenerated every day by this repo's own workflow
 
 ## Web generator
 
+**👉 [commit-horizon.vercel.app](https://commit-horizon.vercel.app)**
+
 No workflow at all: type a username, pick mode, theme and background, watch it live and copy one line.
 Options live in the URL, so a link shows exactly what you picked, and the page speaks English and Spanish.
 
 ```md
-![My GitHub year as a black hole](https://<your-deployment>/api/hole?user=your-username&mode=languages&tz=America/Bogota)
+![My GitHub year as a black hole](https://commit-horizon.vercel.app/api/hole?user=your-username&mode=languages&tz=America/Bogota)
 ```
 
 Query parameters: `user`, `mode`, `theme`, `bg` (`space`/`transparent`), `style`, `langs`, `exclude`,
 `labels`, `tz` and `demo=1`. Images are cached at the edge for 4 hours and served stale while they refresh.
 
-**Deploy your own** (free on Vercel): [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FFelipeBeltranING%2Fcommit-horizon&env=GITHUB_TOKEN&envDescription=Optional%3A%20a%20read-only%20token%20for%20exact%20counts%20and%20higher%20limits)
+**Deploy your own** (free on Vercel, for higher limits or your own tweaks): [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FFelipeBeltranING%2Fcommit-horizon&env=GITHUB_TOKEN&envDescription=Optional%3A%20a%20read-only%20token%20for%20exact%20counts%20and%20higher%20limits)
 Optionally add a `GITHUB_TOKEN` environment variable (any read-only token) for exact counts and higher
 limits. Locally: `npm run dev` → <http://localhost:3000>.
 
