@@ -97,6 +97,15 @@ export function renderSVG(data, opts = {}) {
   // Orbit radius for a (fractional) week index: old weeks outside, recent inside.
   const orbit = (w) => R_IN + (R_OUT - R_IN) * Math.pow(clamp(1 - w / spanW, 0, 1), 1.12);
 
+  // Quiet years (few active days) would look like a thin, faint ring next to a busy one.
+  // `quiet` goes from 0 (active almost every day) to 1 (no activity) and lifts the dust,
+  // the smallest particles and the haze so the disk still reads as a disk.
+  const density = stats.activeDays / Math.max(1, weeks.flat().length);
+  const quiet = clamp(1 - Math.sqrt(density), 0, 1);
+  // …but a year with (almost) no activity is a dormant hole: no extra glow.
+  const awake = Math.min(1, stats.activeDays / 20);
+  const haze = (o) => f2(Math.min(1, o * (1 + 0.8 * quiet * awake)));
+
   const streakGlow = stats.currentStreak === 0 ? 0.22 : clamp(0.5 + (stats.currentStreak / 30) * 0.5, 0.5, 1);
   const recentGlow = clamp((stats.activeLast30 / 30) * 1.15, 0.3, 1);
 
@@ -131,14 +140,14 @@ export function renderSVG(data, opts = {}) {
       const color = lerpColor(T.temp, heat);
       const v = day.count > 0 ? Math.min(1, day.count / stats.scale) : 0;
       if (day.count > 0) {
-        const s = 1.6 + 3.6 * Math.sqrt(v);
-        const o = 0.5 + 0.5 * v;
+        const s = 1.6 + 1.4 * quiet + 3.6 * Math.sqrt(v);
+        const o = Math.min(1, 0.5 + 0.25 * quiet + 0.5 * v);
         dots += `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(s)}" fill="${color}" fill-opacity="${f2(o)}"/>`;
         if (stats.best && day.date === stats.best.date) {
           dots += `<circle class="flare" cx="${f2(x)}" cy="${f2(y)}" r="${f2(s * 3.2)}" fill="url(#flare)"/>`;
         }
       } else {
-        dots += `<circle cx="${f2(x)}" cy="${f2(y)}" r="1.1" fill="${color}" fill-opacity="0.12"/>`;
+        dots += `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(1.1 + 0.5 * quiet)}" fill="${color}" fill-opacity="${f2(0.12 + 0.22 * quiet)}"/>`;
       }
       if (day.date === stats.today) {
         dots += `<circle class="pulse" cx="${f2(x)}" cy="${f2(y)}" r="7" fill="none" stroke="${T.hot}" stroke-width="1.6"/>`;
@@ -209,10 +218,10 @@ ${planets.css}
 <radialGradient id="haze" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${f2(hazeR)}">
 <stop offset="0" stop-color="${T.hot}" stop-opacity="0"/>
 <stop offset="${f2(edge)}" stop-color="${T.hot}" stop-opacity="0"/>
-<stop offset="${f2(edge + 0.02)}" stop-color="${T.hot}" stop-opacity="0.9"/>
-<stop offset="${f2(inner)}" stop-color="${T.hot}" stop-opacity="0.6"/>
-<stop offset="${f2(inner * 1.8)}" stop-color="${T.warm}" stop-opacity="0.2"/>
-<stop offset="0.6" stop-color="${lerpColor(T.temp, 0.7)}" stop-opacity="0.07"/>
+<stop offset="${f2(edge + 0.02)}" stop-color="${T.hot}" stop-opacity="${haze(0.9)}"/>
+<stop offset="${f2(inner)}" stop-color="${T.hot}" stop-opacity="${haze(0.6)}"/>
+<stop offset="${f2(inner * 1.8)}" stop-color="${T.warm}" stop-opacity="${haze(0.2)}"/>
+<stop offset="0.6" stop-color="${lerpColor(T.temp, 0.7)}" stop-opacity="${haze(0.07)}"/>
 <stop offset="1" stop-color="${lerpColor(T.temp, 1)}" stop-opacity="0"/>
 </radialGradient>
 <radialGradient id="lens" gradientUnits="userSpaceOnUse" cx="${CX}" cy="${CY}" r="${f2(hoOut)}">
