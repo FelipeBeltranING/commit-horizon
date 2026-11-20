@@ -1,0 +1,27 @@
+name: 🐛 Bug report
+description: Something renders wrong or the CLI fails
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include the command you ran and a screenshot of the SVG if it's visual.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Node version, OS and time zone
+      placeholder: Node 22, Windows 11, America/Bogota
+  - type: dropdown
+    id: token
+    attributes:
+      label: Were you using GITHUB_TOKEN?
+      options: ["Yes (GraphQL)", "No (public page)", "Not sure"]
