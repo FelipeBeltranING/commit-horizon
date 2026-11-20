@@ -78,14 +78,18 @@ language I use".
 - `color` — temperature gradient, white-blue core to red outer disk.
 - `bw` — black and white, *Interstellar* style.
 
+## Contributing
+
+PRs are very welcome, especially new celestial bodies (moons, comets, pulsars…: SVG + CSS keyframes).
+Read the [contributing guide](CONTRIBUTING.md) and check the issues labelled
+[`good first issue`](../../labels/good%20first%20issue).
+
 ## Roadmap
 
-- [ ] GitHub Action + Marketplace
-- [ ] Web generator (`/api/hole?user=...`)
-- [ ] Moons for the longest streak
-- [ ] Galaxy and solar-system modes
-- [ ] MP4/GIF recorder
+The [issues](../../issues) and [milestones](../../milestones) are the roadmap:
+**v0.3 · Launch pad** (GitHub Action, web generator, video), **v0.4 · Celestial events**
+(moons, comets, supernova, pulsar) and **v0.5 · New universes** (galaxy, solar system, binary holes).
 
 ## License
 
-MIT
+MIT © David Felipe Beltrán Tabares
