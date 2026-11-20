@@ -10,7 +10,7 @@
     "demo": "node scripts/demo.js",
     "preview": "node scripts/preview.js",
     "test": "node --test",
-    "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out out/commit-horizon-languages.svg"
+    "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out examples/commit-horizon-languages.svg"
   },
   "engines": {
     "node": ">=18"

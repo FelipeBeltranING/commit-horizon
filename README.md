@@ -8,7 +8,7 @@ An animated SVG for your profile README. Every day of the last year is a particl
 light orbiting in the accretion disk: old days drift on the cold outer edge, recent
 days race near the event horizon, and **today** is right at the edge, about to cross.
 
-![Commit Horizon](out/commit-horizon-color.svg)
+![Commit Horizon](examples/commit-horizon-color.svg)
 
 ## How the data maps to space
 
@@ -33,7 +33,7 @@ red outside).
 Requires Node 18+. No required dependencies (devicon is optional, only for logos).
 
 ```bash
-npm run demo        # out/commit-horizon-{color,bw,languages}.svg + out/preview.html
+npm run demo        # examples/commit-horizon-{color,bw,languages}.svg + out/preview.html
 npm run preview     # live preview at http://localhost:4321 (re-renders on every refresh)
 npm test
 ```
