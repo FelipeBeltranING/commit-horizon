@@ -47,6 +47,10 @@ node bin/commit-horizon.js --user FelipeBeltranING --theme bw    --out out/me-bw
 
 Set `GITHUB_TOKEN` to use the GraphQL API; without it the public contributions page is read.
 
+"Today" is your local day: the CLI uses your machine's time zone (pass `--timezone America/Bogota`
+when it runs somewhere else, like CI). Without this, GitHub's UTC calendar would break your streak
+every evening west of UTC.
+
 ## Languages in orbit
 
 `--mode languages` keeps the black hole and puts your top languages in orbit around

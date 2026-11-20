@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { demoData } from '../src/demo.js';
 import { renderSVG } from '../src/render.js';
-import { computeStats, toWeeks } from '../src/stats.js';
+import { computeStats, localDate, toWeeks } from '../src/stats.js';
 import { hashString, mulberry32 } from '../src/prng.js';
-import { parseContributionsHtml } from '../src/github.js';
+import { fetchUserData, parseContributionsHtml } from '../src/github.js';
 
 const today = new Date('2026-10-31T12:00:00Z');
 
@@ -81,4 +81,31 @@ test('parses the public contributions page', () => {
     { date: '2026-10-29', count: 1204 },
     { date: '2026-10-30', count: 0 },
   ]);
+});
+
+test('localDate follows the time zone and rejects unknown zones', () => {
+  const now = new Date('2026-11-20T01:35:00Z'); // 20:35 in Bogotá
+  assert.equal(localDate('UTC', now), '2026-11-20');
+  assert.equal(localDate('America/Bogota', now), '2026-11-19');
+  assert.throws(() => localDate('Mars/Olympus_Mons', now), /Unknown time zone/);
+});
+
+test('the UTC "tomorrow" of the public page does not break the streak', async () => {
+  const realFetch = globalThis.fetch;
+  const cell = (date, i) => `<td data-date="${date}" id="d${i}" class="ContributionCalendar-day"></td>`;
+  const tip = (i, n) => `<tool-tip for="d${i}">${n ? `${n} contributions` : 'No contributions'} on a day.</tool-tip>`;
+  const counts = [['2026-11-15', 4], ['2026-11-16', 40], ['2026-11-17', 4], ['2026-11-18', 3], ['2026-11-19', 0], ['2026-11-20', 0]];
+  const html = counts.map(([d], i) => cell(d, i)).join('') + counts.map(([, n], i) => tip(i, n)).join('');
+  try {
+    globalThis.fetch = async (url) =>
+      String(url).includes('/contributions') ? new Response(html) : new Response('{"public_repos":13}');
+    const now = new Date('2026-11-20T01:35:00Z');
+    const utc = await fetchUserData('someone', { token: '', timeZone: 'UTC', now });
+    const bog = await fetchUserData('someone', { token: '', timeZone: 'America/Bogota', now });
+    assert.equal(computeStats(utc.weeks).currentStreak, 0);
+    assert.equal(computeStats(bog.weeks).currentStreak, 4);
+    assert.equal(bog.weeks.flat().at(-1).date, '2026-11-19');
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
