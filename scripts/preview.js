@@ -2,8 +2,6 @@
 // In VS Code: Ctrl+Shift+P → "Simple Browser: Show" → paste the URL.
 // Every reload re-renders, so you can edit src/render.js and refresh.
 import { createServer } from 'node:http';
-import { pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
 import { previewPage } from './page.js';
 
 const PORT = Number(process.env.PORT) || 4321;
@@ -13,7 +11,8 @@ const TIME_ZONE = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().time
 async function load(user) {
   // Re-import on each request so edits to src/ show up without restarting.
   const bust = `?t=${Date.now()}`;
-  const imp = (p) => import(pathToFileURL(resolve(p)).href + bust);
+  // Paths are relative to the repo root, not to the directory you started the server from.
+  const imp = (p) => import(new URL(`../${p}`, import.meta.url).href + bust);
   const [{ renderSVG }, { demoData }, { fetchUserData }, { withIcons }, { demoLanguages, fetchLanguages }] =
     await Promise.all([
       imp('src/render.js'),
@@ -51,11 +50,12 @@ createServer(async (req, res) => {
   try {
     if (url.pathname === '/hole.svg') {
       const theme = url.searchParams.get('theme') === 'bw' ? 'bw' : 'color';
+      const background = url.searchParams.get('background') === 'transparent' ? 'transparent' : 'space';
       const mode = url.searchParams.get('mode') === 'languages' ? 'languages' : 'disk';
       const { renderSVG, data, languages, langError } = await load(user);
       res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' });
       const langOpts = mode === 'languages' ? { languages, note: langError && `languages: ${langError}` } : {};
-      return res.end(renderSVG(data, { theme, ...langOpts }));
+      return res.end(renderSVG(data, { theme, background, ...langOpts }));
     }
     if (url.pathname === '/') {
       const q = user ? `user=${encodeURIComponent(user)}&` : '';
@@ -65,6 +65,7 @@ createServer(async (req, res) => {
         previewPage({
           color: `/hole.svg?${q}theme=color&t=${t}`,
           bw: `/hole.svg?${q}theme=bw&t=${t}`,
+          transparent: `/hole.svg?${q}background=transparent&t=${t}`,
           languages: `/hole.svg?${q}mode=languages&t=${t}`,
           user,
           live: true,

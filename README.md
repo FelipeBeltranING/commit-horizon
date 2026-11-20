@@ -92,6 +92,7 @@ npm test
 | `--user`, `-u` | | Whose year falls into the hole |
 | `--demo` | | Fake but believable data, no network |
 | `--theme`, `-t` | `color` | `color` or `bw` |
+| `--background`, `-b` | `space` | `space` (dark card) or `transparent` (floats on your README, labels in gray) |
 | `--mode`, `-m` | `disk` | `disk`, or `languages` to put your top languages in orbit |
 | `--style` | `logos` | `logos` (floating logos) or `planets` (logos inside planets) |
 | `--langs` | `6` | How many languages in orbit (1–8) |

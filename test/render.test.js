@@ -125,3 +125,13 @@ test('quiet years get more visible dust; dormant holes get no extra glow', () =>
   assert.match(dormant, /stop-color="[^"]+" stop-opacity="0\.9"\/>/); // haze not boosted
   assert.doesNotMatch(quiet, /stop-opacity="0\.9"\/>\n<stop offset="[\d.]+" stop-color="[^"]+" stop-opacity="0\.6"/);
 });
+
+test('transparent background drops the space card and uses gray labels', () => {
+  const data = demoData({ today });
+  const space = renderSVG(data);
+  const clear = renderSVG(data, { background: 'transparent' });
+  assert.match(space, /fill="url\(#bg\)"/);
+  assert.doesNotMatch(clear, /fill="url\(#bg\)"/);
+  assert.match(clear, /fill="#7d8590" font-size="13" text-anchor="end">@demo-astronaut/);
+  assert.doesNotMatch(clear, /fill="#e9edf6"/);
+});
