@@ -51,7 +51,8 @@ each logo inside a small glowing planet instead):
 Where the logos come from, in order:
 
 1. `icons/<language>.svg` or `icons/<language>.png` in this repo (e.g. `icons/python.png`, `icons/cplusplus.svg`) — your own files win;
-2. the `devicon` package (`npm install`).
+2. `icons/devicon/`: copies of the devicon logos for every language we map (74 KB instead of the 139 MB package), so nothing needs installing;
+3. the `devicon` package, if you `npm install` it.
 
 If neither has it, the language shows short initials (Py, JS, GD…) in its GitHub color.
 Logos are trademarks of their respective owners and come from
