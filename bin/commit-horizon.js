@@ -2,11 +2,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { parseArgs } from 'node:util';
-import { demoData } from '../src/demo.js';
-import { fetchUserData } from '../src/github.js';
-import { withIcons } from '../src/icons.js';
-import { demoLanguages, fetchLanguages } from '../src/languages.js';
-import { BACKGROUNDS, renderSVG, THEME_NAMES } from '../src/render.js';
+import { buildHole } from '../src/build.js';
 
 const { values } = parseArgs({
   options: {
@@ -44,36 +40,17 @@ Options:
   --out file.svg
 
 Set GITHUB_TOKEN to use the GraphQL API (otherwise public endpoints are used).
-Logos: icons/<language>.svg|png first (e.g. icons/python.png), then the devicon package (npm install).`);
+Logos: icons/<language>.svg|png first (e.g. icons/python.png), then icons/devicon/.`);
   process.exit(values.help ? 0 : 1);
 }
 
-if (!THEME_NAMES.includes(values.theme)) {
-  console.error(`Unknown theme "${values.theme}". Use: ${THEME_NAMES.join(', ')}`);
-  process.exit(1);
-}
-if (!BACKGROUNDS.includes(values.background)) {
-  console.error(`Unknown background "${values.background}". Use: ${BACKGROUNDS.join(', ')}`);
-  process.exit(1);
-}
-if (!['disk', 'languages'].includes(values.mode)) {
-  console.error(`Unknown mode "${values.mode}". Use: disk, languages`);
-  process.exit(1);
-}
-
 try {
-  const user = values.user ?? 'demo-astronaut';
-  const timeZone = values.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
-  const data = values.demo ? demoData({ user }) : await fetchUserData(user, { timeZone });
-  let languages;
-  if (values.mode === 'languages') {
-    const opts = { limit: Math.min(8, Math.max(1, Number(values.langs) || 6)), exclude: values.exclude.split(',') };
-    languages = withIcons(values.demo ? demoLanguages(opts) : await fetchLanguages(user, opts));
-    if (!languages.length) console.warn(`ⓘ no languages found for ${user} (only forks, or repos without code)`);
-    const missing = languages.filter((l) => !l.icon).map((l) => l.name);
-    if (missing.length) console.warn(`ⓘ no logo for: ${missing.join(', ')} (run npm install, or they show initials)`);
-  }
-  const svg = renderSVG(data, { theme: values.theme, background: values.background, languages, style: values.style, labels: !values['no-labels'] });
+  const { svg, warnings } = await buildHole({
+    ...values,
+    labels: !values['no-labels'],
+    timeZone: values.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
+  for (const w of warnings) console.warn(`ⓘ ${w}`);
   await mkdir(dirname(values.out), { recursive: true });
   await writeFile(values.out, svg);
   console.log(`✔ ${values.out} (${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB)`);
