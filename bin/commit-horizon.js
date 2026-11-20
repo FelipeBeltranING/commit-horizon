@@ -17,6 +17,7 @@ const { values } = parseArgs({
     langs: { type: 'string', default: '6' },
     exclude: { type: 'string', default: '' },
     'no-labels': { type: 'boolean', default: false },
+    timezone: { type: 'string', short: 'z' },
     out: { type: 'string', short: 'o', default: 'out/commit-horizon.svg' },
     demo: { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
@@ -37,6 +38,7 @@ Options:
   --langs 6                 how many languages in orbit (1-8)
   --exclude "HTML,CSS"      languages to leave out
   --no-labels               hide "Python 24%" under each planet
+  --timezone America/Bogota your time zone, so "today" is yours (default: this machine's)
   --out file.svg
 
 Set GITHUB_TOKEN to use the GraphQL API (otherwise public endpoints are used).
@@ -55,7 +57,8 @@ if (!['disk', 'languages'].includes(values.mode)) {
 
 try {
   const user = values.user ?? 'demo-astronaut';
-  const data = values.demo ? demoData({ user }) : await fetchUserData(user);
+  const timeZone = values.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
+  const data = values.demo ? demoData({ user }) : await fetchUserData(user, { timeZone });
   let languages;
   if (values.mode === 'languages') {
     const opts = { limit: Math.min(8, Math.max(1, Number(values.langs) || 6)), exclude: values.exclude.split(',') };

@@ -1,7 +1,7 @@
 // Fetches the contribution calendar for a user.
 // With GITHUB_TOKEN it uses the GraphQL API; without it, it reads the public
 // contributions page (the same HTML GitHub uses for the profile graph).
-import { toWeeks } from './stats.js';
+import { dropFutureDays, localDate, toWeeks } from './stats.js';
 
 const UA = { 'User-Agent': 'commit-horizon' };
 
@@ -16,9 +16,16 @@ const QUERY = `query($login: String!) {
   }
 }`;
 
-export async function fetchUserData(user, { token = process.env.GITHUB_TOKEN } = {}) {
+/**
+ * @param {string} user
+ * @param {{ token?: string, timeZone?: string, now?: Date }} [opts]
+ *   timeZone: the user's IANA zone; days after their local today are dropped.
+ */
+export async function fetchUserData(user, { token = process.env.GITHUB_TOKEN, timeZone = 'UTC', now = new Date() } = {}) {
   if (!/^[a-z\d](?:[a-z\d-]{0,38})$/i.test(user)) throw new Error(`Invalid GitHub username: ${user}`);
-  return token ? viaGraphQL(user, token) : viaPublicPage(user);
+  const today = localDate(timeZone, now);
+  const { repos, days } = token ? await viaGraphQL(user, token) : await viaPublicPage(user);
+  return { user, repos, weeks: toWeeks(dropFutureDays(days, today)) };
 }
 
 async function viaGraphQL(user, token) {
@@ -35,7 +42,7 @@ async function viaGraphQL(user, token) {
   const days = u.contributionsCollection.contributionCalendar.weeks
     .flatMap((w) => w.contributionDays)
     .map((d) => ({ date: d.date, count: d.contributionCount }));
-  return { user, repos: u.repositories.totalCount, weeks: toWeeks(days) };
+  return { repos: u.repositories.totalCount, days };
 }
 
 async function viaPublicPage(user) {
@@ -50,7 +57,7 @@ async function viaPublicPage(user) {
   } catch {
     /* keep default */
   }
-  return { user, repos, weeks: toWeeks(days) };
+  return { repos, days };
 }
 
 export function parseContributionsHtml(html) {
