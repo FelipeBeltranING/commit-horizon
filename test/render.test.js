@@ -109,3 +109,19 @@ test('the UTC "tomorrow" of the public page does not break the streak', async ()
     globalThis.fetch = realFetch;
   }
 });
+
+test('quiet years get more visible dust; dormant holes get no extra glow', () => {
+  const year = (active) =>
+    Array.from({ length: 364 }, (_, k) => ({
+      date: new Date(Date.UTC(2025, 10, 30) + k * 86400000).toISOString().slice(0, 10),
+      count: k % Math.ceil(364 / Math.max(1, active)) === 0 && active ? 3 : 0,
+    }));
+  const dust = (svg) => [...svg.matchAll(/r="([\d.]+)" fill="#[0-9a-f]{6}" fill-opacity="([\d.]+)"\/>/g)].filter((m) => Number(m[1]) < 2);
+  const busyish = renderSVG({ user: 'a', repos: 5, weeks: toWeeks(year(300)) });
+  const quiet = renderSVG({ user: 'a', repos: 5, weeks: toWeeks(year(20)) });
+  const dormant = renderSVG({ user: 'a', repos: 5, weeks: toWeeks(year(0)) });
+  assert.ok(Number(dust(quiet)[0][2]) > Number(dust(busyish)[0][2]), 'quiet dust is brighter');
+  assert.ok(Number(dust(quiet)[0][1]) > Number(dust(busyish)[0][1]), 'quiet dust is bigger');
+  assert.match(dormant, /stop-color="[^"]+" stop-opacity="0\.9"\/>/); // haze not boosted
+  assert.doesNotMatch(quiet, /stop-opacity="0\.9"\/>\n<stop offset="[\d.]+" stop-color="[^"]+" stop-opacity="0\.6"/);
+});
