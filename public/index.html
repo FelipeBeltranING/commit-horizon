@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commit Horizon · your GitHub year, falling into a black hole</title>
+<meta name="description" content="Turn your GitHub contributions into an animated black hole for your profile README. Type your username, pick a style, copy one line.">
+<meta name="theme-color" content="#03040a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='16' cy='16' rx='15' ry='4' fill='none' stroke='%23ffb45e' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23000' stroke='%23fff6e6' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="./"><span class="mark" aria-hidden="true"></span>COMMIT HORIZON</a>
+  <nav>
+    <button type="button" class="lang" id="lang" aria-label="Switch language">ES</button>
+    <a href="https://github.com/FelipeBeltranING/commit-horizon" class="gh" data-i18n="source">Source</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="kicker" data-i18n="kicker">// a widget for your GitHub profile README</p>
+    <h1 data-i18n-html="title">Your year, <em>falling</em> into a black&nbsp;hole.</h1>
+    <p class="lede" data-i18n="lede">Every day of the last twelve months is a particle of light in the accretion disk. Old days drift on the cold edge, recent ones race near the horizon, and today is about to cross.</p>
+
+    <form id="form" class="ask" autocomplete="off" novalidate>
+      <label class="field">
+        <span aria-hidden="true">@</span>
+        <input id="user" name="user" maxlength="39" spellcheck="false" autocapitalize="off" data-i18n-placeholder="placeholder" placeholder="your-github-username" aria-describedby="err">
+      </label>
+      <button type="submit" class="go" data-i18n="go">Pull it in</button>
+    </form>
+    <p id="err" class="err" role="alert"></p>
+  </section>
+
+  <section class="studio" aria-label="Preview and options">
+    <figure class="stage" id="stage" data-surface="dark" data-loading="true">
+      <img id="img" alt="">
+      <div class="loader" aria-hidden="true"><span></span></div>
+      <figcaption id="caption"></figcaption>
+    </figure>
+
+    <div class="controls">
+      <fieldset class="seg" data-key="mode">
+        <legend data-i18n="mode">Mode</legend>
+        <button type="button" data-value="disk" data-i18n="disk">Disk</button>
+        <button type="button" data-value="languages" data-i18n="languages">Languages in orbit</button>
+      </fieldset>
+      <fieldset class="seg" data-key="theme">
+        <legend data-i18n="theme">Theme</legend>
+        <button type="button" data-value="color" data-i18n="color">Color</button>
+        <button type="button" data-value="bw" data-i18n="bw">Interstellar B&amp;W</button>
+      </fieldset>
+      <fieldset class="seg" data-key="bg">
+        <legend data-i18n="background">Background</legend>
+        <button type="button" data-value="space" data-i18n="space">Space</button>
+        <button type="button" data-value="transparent" data-i18n="transparent">Transparent</button>
+      </fieldset>
+      <fieldset class="seg" data-key="style" data-needs="languages">
+        <legend data-i18n="style">Logos</legend>
+        <button type="button" data-value="logos" data-i18n="logos">Floating</button>
+        <button type="button" data-value="planets" data-i18n="planets">Planets</button>
+      </fieldset>
+      <fieldset class="seg" data-key="surface">
+        <legend data-i18n="surface">Preview on</legend>
+        <button type="button" data-value="dark" data-i18n="dark">Dark README</button>
+        <button type="button" data-value="light" data-i18n="light">Light README</button>
+      </fieldset>
+      <label class="tz">
+        <span data-i18n="tz">Your time zone</span>
+        <input id="tz" list="zones" spellcheck="false">
+        <small data-i18n="tzHint">So your streak follows your day, not UTC.</small>
+      </label>
+      <datalist id="zones">
+        <option value="America/Bogota"><option value="America/Mexico_City"><option value="America/Lima">
+        <option value="America/Santiago"><option value="America/Argentina/Buenos_Aires"><option value="America/Sao_Paulo">
+        <option value="America/New_York"><option value="America/Los_Angeles"><option value="Europe/Madrid">
+        <option value="Europe/London"><option value="Asia/Kolkata"><option value="Asia/Tokyo"><option value="UTC">
+      </datalist>
+    </div>
+  </section>
+
+  <section class="get" aria-labelledby="get-title">
+    <h2 id="get-title" data-i18n="getTitle">Put it in your README</h2>
+    <div class="cards">
+      <article class="card">
+        <header><span class="step">01</span><h3 data-i18n="mdTitle">Paste one line</h3></header>
+        <p data-i18n="mdText">Refreshed every few hours. Nothing to install.</p>
+        <pre><code id="md"></code></pre>
+        <button type="button" class="copy" data-copy="md" data-i18n="copy">Copy</button>
+      </article>
+      <article class="card">
+        <header><span class="step">02</span><h3 data-i18n="actionTitle">Or let an Action redraw it daily</h3></header>
+        <p data-i18n-html="actionText">In <code>.github/workflows/commit-horizon.yml</code> of your profile repo, then publish <code>dist/</code> to a branch.</p>
+        <pre><code id="yaml"></code></pre>
+        <button type="button" class="copy" data-copy="yaml" data-i18n="copy">Copy</button>
+      </article>
+      <article class="card">
+        <header><span class="step">03</span><h3 data-i18n="dlTitle">Or keep the file</h3></header>
+        <p data-i18n="dlText">A self-contained animated SVG, no JavaScript, under 300 KB.</p>
+        <a id="download" class="dl" download="commit-horizon.svg" data-i18n="download">Download SVG</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="map" aria-labelledby="map-title">
+    <h2 id="map-title" data-i18n="mapTitle">How your year maps to space</h2>
+    <dl>
+      <div><dt data-i18n="m1a">Contributions per day</dt><dd data-i18n="m1b">size and brightness of each particle</dd></div>
+      <div><dt data-i18n="m2a">Week of the year</dt><dd data-i18n="m2b">orbit radius: old outside, recent inside</dd></div>
+      <div><dt data-i18n="m3a">Yearly total</dt><dd data-i18n="m3b">mass of the hole</dd></div>
+      <div><dt data-i18n="m4a">Current streak</dt><dd data-i18n="m4b">the photon ring, dimmed if broken</dd></div>
+      <div><dt data-i18n="m5a">Best day</dt><dd data-i18n="m5b">a pulsing flare on its orbit</dd></div>
+      <div><dt data-i18n="m6a">Top languages</dt><dd data-i18n="m6b">logos orbiting, passing behind the shadow</dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>MIT · <a href="https://github.com/FelipeBeltranING">@FelipeBeltranING</a></span>
+  <span data-i18n="sibling">Sibling of</span>&nbsp;<a href="https://github.com/FelipeBeltranING/gitfarm">GitFarm 🌻</a>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

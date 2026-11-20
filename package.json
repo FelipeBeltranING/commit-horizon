@@ -9,6 +9,7 @@
   "scripts": {
     "demo": "node scripts/demo.js",
     "preview": "node scripts/preview.js",
+    "dev": "node tools/dev-server.mjs",
     "test": "node --test",
     "vendor-icons": "node scripts/vendor-icons.mjs",
     "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out examples/commit-horizon-languages.svg"
