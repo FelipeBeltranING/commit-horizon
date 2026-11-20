@@ -18,6 +18,27 @@ export function toWeeks(days) {
   return weeks;
 }
 
+/**
+ * Today's date (YYYY-MM-DD) in an IANA time zone, e.g. 'America/Bogota'.
+ * Throws a readable error for an unknown zone.
+ */
+export function localDate(timeZone = 'UTC', now = new Date()) {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  } catch {
+    throw new Error(`Unknown time zone: ${timeZone} (use an IANA name like America/Bogota)`);
+  }
+}
+
+/**
+ * GitHub's public contributions page is bucketed in UTC, so in the evening west of
+ * UTC it already shows an empty "tomorrow". Dropping the days after the local today
+ * keeps that empty day from breaking the current streak.
+ */
+export function dropFutureDays(days, today) {
+  return today ? days.filter((d) => d.date <= today) : days;
+}
+
 export function percentile(values, p) {
   if (!values.length) return 0;
   const s = [...values].sort((a, b) => a - b);
