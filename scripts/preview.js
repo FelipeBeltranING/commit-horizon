@@ -7,7 +7,8 @@ import { resolve } from 'node:path';
 import { previewPage } from './page.js';
 
 const PORT = Number(process.env.PORT) || 4321;
-const cache = new Map(); // user -> { at, data }
+const cache = new Map(); // user -> { at, promise }
+const TIME_ZONE = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
 async function load(user) {
   // Re-import on each request so edits to src/ show up without restarting.
@@ -28,7 +29,7 @@ async function load(user) {
   let hit = cache.get(user);
   if (!hit || Date.now() - hit.at > 10 * 60 * 1000) {
     const promise = Promise.all([
-      fetchUserData(user),
+      fetchUserData(user, { timeZone: TIME_ZONE }),
       fetchLanguages(user).then(
         (langs) => ({ langs, langError: langs.length ? null : 'no languages found in public non-fork repos' }),
         (err) => ({ langs: [], langError: err.message }),
