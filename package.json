@@ -12,7 +12,8 @@
     "dev": "node tools/dev-server.mjs",
     "test": "node --test",
     "vendor-icons": "node scripts/vendor-icons.mjs",
-    "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out examples/commit-horizon-languages.svg"
+    "demo:languages": "node bin/commit-horizon.js --demo --mode languages --out examples/commit-horizon-languages.svg",
+    "record": "node tools/record.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -29,5 +30,8 @@
   "license": "MIT",
   "optionalDependencies": {
     "devicon": "^2.16.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
   }
 }

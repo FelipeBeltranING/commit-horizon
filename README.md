@@ -12,9 +12,9 @@ edge, about to cross.
 [![Tests](https://github.com/FelipeBeltranING/commit-horizon/actions/workflows/test.yml/badge.svg)](https://github.com/FelipeBeltranING/commit-horizon/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ffb45e)](LICENSE)
 [![Node 18+](https://img.shields.io/badge/node-18%2B-3d72bd)](package.json)
-[![No dependencies](https://img.shields.io/badge/dependencies-0-0e8a16)](package.json)
+[![No runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-0-0e8a16)](package.json)
 
-**[🚀 Use the GitHub Action](#put-a-black-hole-in-your-readme-2-minutes)** · **[🌐 Web generator](#web-generator)** · **[🔭 Run it locally](#run-it-locally)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
+**[🚀 Use the GitHub Action](#put-a-black-hole-in-your-readme-2-minutes)** · **[🌐 Web generator](#web-generator)** · **[🎞️ Share it as a video](#share-it-as-a-video)** · **[🔭 Run it locally](#run-it-locally)** · **[🪐 Languages in orbit](#languages-in-orbit)** · **[🗺️ Roadmap](#roadmap)** · **[🤝 Contribute](CONTRIBUTING.md)**
 
 </div>
 
@@ -168,6 +168,20 @@ npm run preview     # live preview at http://localhost:4321/?user=your-username
 npm run demo        # regenerate examples/*.svg (fake data, no network)
 npm test
 ```
+
+## Share it as a video
+
+SVGs don't play on Reddit, X or Discord, so you can record your black hole:
+
+```bash
+npm install                                          # once: Playwright (dev dependency)
+node tools/record.mjs out/me.svg --out me.webm       # nothing else needed
+node tools/record.mjs out/me.svg --out me.mp4        # or .gif: needs ffmpeg on your PATH
+node tools/record.mjs out/me.svg --out me.png        # a sharp still frame (2×), for a social preview
+```
+
+Options: `--seconds 12`, `--width 840`, `--fps 30`, `--background "#0d1117"`. It uses Playwright's
+Chromium if you installed it (`npx playwright install chromium`), otherwise your Chrome or Edge.
 
 ## CLI options
 
