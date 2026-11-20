@@ -48,6 +48,7 @@ const THEMES = {
 };
 
 export const THEME_NAMES = Object.keys(THEMES);
+export const BACKGROUNDS = ['space', 'transparent'];
 
 const f2 = (n) => Number(n.toFixed(2)).toString();
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -77,12 +78,14 @@ const shortDate = (d) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(
 
 /**
  * @param {{ user: string, weeks: {date:string,count:number}[][], repos?: number }} data
- * @param {{ theme?: 'color'|'bw', languages?: object[], labels?: boolean, note?: string, style?: 'logos'|'planets' }} [opts]
+ * @param {{ theme?: 'color'|'bw', background?: 'space'|'transparent', languages?: object[], labels?: boolean, note?: string, style?: 'logos'|'planets' }} [opts]
  *   languages: from withIcons(topLanguages(...)) — turns on the planets mode.
  */
 export function renderSVG(data, opts = {}) {
   const theme = THEMES[opts.theme] ? opts.theme : 'color';
-  const T = THEMES[theme];
+  const transparent = opts.background === 'transparent';
+  // Without the space card the labels sit on the README itself: a mid gray reads on light and dark.
+  const T = transparent ? { ...THEMES[theme], text: '#7d8590', muted: '#7d8590' } : THEMES[theme];
   const weeks = data.weeks.slice(-53).filter((w) => w.length);
   const stats = computeStats(weeks);
   const rnd = mulberry32(hashString(`${data.user}|${stats.today}`));
@@ -242,7 +245,7 @@ ${planets.defs}
 <filter id="lshadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.4"/><feOffset dy="1.5"/><feComponentTransfer><feFuncA type="linear" slope=".65"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
 <g clip-path="url(#frame)">
-<rect width="${W}" height="${H}" fill="url(#bg)"/>
+${transparent ? '' : `<rect width="${W}" height="${H}" fill="url(#bg)"/>`}
 <g>${stars}</g>
 <g font-family="${font}" filter="url(#lshadow)">${planets.back}</g>
 <g mask="url(#doppler)" opacity="${f2(0.55 + 0.45 * recentGlow)}">

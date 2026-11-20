@@ -6,12 +6,13 @@ import { demoData } from '../src/demo.js';
 import { fetchUserData } from '../src/github.js';
 import { withIcons } from '../src/icons.js';
 import { demoLanguages, fetchLanguages } from '../src/languages.js';
-import { renderSVG, THEME_NAMES } from '../src/render.js';
+import { BACKGROUNDS, renderSVG, THEME_NAMES } from '../src/render.js';
 
 const { values } = parseArgs({
   options: {
     user: { type: 'string', short: 'u' },
     theme: { type: 'string', short: 't', default: 'color' },
+    background: { type: 'string', short: 'b', default: 'space' },
     mode: { type: 'string', short: 'm', default: 'disk' },
     style: { type: 'string', default: 'logos' },
     langs: { type: 'string', default: '6' },
@@ -33,6 +34,7 @@ Usage:
 
 Options:
   --theme color|bw          color palette (default color)
+  --background space|transparent   dark space card (default) or float on your README
   --mode disk|languages     languages = your top languages orbit as planets
   --style logos|planets     floating logos (default) or logos inside planets
   --langs 6                 how many languages in orbit (1-8)
@@ -48,6 +50,10 @@ Logos: icons/<language>.svg|png first (e.g. icons/python.png), then the devicon 
 
 if (!THEME_NAMES.includes(values.theme)) {
   console.error(`Unknown theme "${values.theme}". Use: ${THEME_NAMES.join(', ')}`);
+  process.exit(1);
+}
+if (!BACKGROUNDS.includes(values.background)) {
+  console.error(`Unknown background "${values.background}". Use: ${BACKGROUNDS.join(', ')}`);
   process.exit(1);
 }
 if (!['disk', 'languages'].includes(values.mode)) {
@@ -67,7 +73,7 @@ try {
     const missing = languages.filter((l) => !l.icon).map((l) => l.name);
     if (missing.length) console.warn(`ⓘ no logo for: ${missing.join(', ')} (run npm install, or they show initials)`);
   }
-  const svg = renderSVG(data, { theme: values.theme, languages, style: values.style, labels: !values['no-labels'] });
+  const svg = renderSVG(data, { theme: values.theme, background: values.background, languages, style: values.style, labels: !values['no-labels'] });
   await mkdir(dirname(values.out), { recursive: true });
   await writeFile(values.out, svg);
   console.log(`✔ ${values.out} (${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB)`);
